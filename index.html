@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO y Redes Sociales: Esto hace que se vea bien al compartir el link -->
+    <title>Venezuela: El Último Nodo | Serie Documental</title>
+    <meta name="description" content="Infografía interactiva sobre la serie conceptual: Energía, poder y el rediseño del hemisferio occidental.">
+    <meta property="og:title" content="Venezuela: El Último Nodo - Infografía">
+    <meta property="og:description" content="No fue ideología, fueron recursos. Explora la narrativa geopolítica de las 7 temporadas.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1516937941348-c09645f31e88?q=80&w=2070&auto=format&fit=crop">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon (Icono de la pestaña) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛢️</text></svg>">
+
+    <!-- Tailwind CSS (Estilos) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js (Gráficos) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts (Tipografía Cinemática) -->
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- Paleta de Colores: Deep Midnight (#0f172a), Neon Gold (#fbbf24), Electric Cyan (#22d3ee), Signal Red (#ef4444) -->
+
+    <style>
+        /* Estilos base */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #e2e8f0; /* Slate 200 */
+            scroll-behavior: smooth;
+        }
+        h1, h2, h3, .cinematic-title {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+        }
+        
+        /* Contenedor de gráficos responsivo */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 350px; /* Altura base móvil */
+            margin: 0 auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px; /* Altura escritorio */
+            }
+        }
+
+        /* Efectos visuales de tarjetas */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+
+        /* Efectos de texto Neón */
+        .neon-text-gold {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+        .neon-text-cyan {
+            color: #22d3ee;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        }
+
+        /* Animaciones simples */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+
+    <!-- HERO SECTION (Portada) -->
+    <header class="min-h-screen flex flex-col justify-center items-center text-center p-6 bg-[url('https://images.unsplash.com/photo-1516937941348-c09645f31e88?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat relative">
+        <!-- Capa oscura superpuesta para legibilidad -->
+        <div class="absolute inset-0 bg-slate-900/90"></div>
+        
+        <div class="relative z-10 max-w-4xl mx-auto animate-fade-in-up">
+            <p class="text-cyan-400 tracking-[0.3em] text-xs md:text-sm mb-4 font-bold uppercase">Una Propuesta Conceptual</p>
+            <h1 class="text-6xl md:text-8xl font-bold mb-2 text-white leading-tight drop-shadow-2xl">VENEZUELA</h1>
+            <h2 class="text-4xl md:text-5xl font-light text-slate-300 mb-8 neon-text-gold">EL ÚLTIMO NODO</h2>
+            
+            <div class="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-600 mx-auto mb-8"></div>
+            
+            <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto italic font-light">
+                "Esto nunca fue socialismo vs capitalismo. Fue recursos, ubicación, poder y tiempo."
+            </p>
+            
+            <!-- Datos clave de la serie -->
+            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs md:text-sm font-mono text-slate-400 border-t border-slate-700 pt-6">
+                <div>7 TEMPORADAS</div>
+                <div>GÉNERO: GEOPOLÍTICA</div>
+                <div>ESTADO: CLASIFICADO</div>
+                <div>OBJETIVO: REDISEÑO</div>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 animate-bounce text-slate-500">
+            <p class="text-xs uppercase tracking-widest mb-2">Desliza para investigar</p>
+            <span class="text-2xl">⬇</span>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT GRID -->
+    <main class="container mx-auto px-4 py-16 space-y-32">
+
+        <!-- SECCIÓN 1: LOS RECURSOS (Temporada 1) -->
+        <section id="season-1" class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <div class="flex items-center space-x-4">
+                    <span class="bg-yellow-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(234,179,8,0.5)]">T1</span>
+                    <h2 class="text-4xl cinematic-title text-white">El Botín Enterrado</h2>
+                </div>
+                <p class="text-lg text-slate-300 leading-relaxed border-l-2 border-yellow-500 pl-4">
+                    Para entender el conflicto, primero hay que entender el premio. Venezuela no es un problema político; es un <strong>activo geoestratégico</strong> mal gestionado. La primera temporada explora la magnitud absurda de los recursos bajo el suelo.
+                </p>
+                <ul class="space-y-4 text-slate-400 font-light">
+                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
+                        <span class="text-yellow-400 mr-3 text-xl">🛢️</span>
+                        <span><strong>Petróleo:</strong> Las mayores reservas probadas del planeta (+300B barriles).</span>
+                    </li>
+                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
+                        <span class="text-yellow-400 mr-3 text-xl">💨</span>
+                        <span><strong>Gas:</strong> 8va reserva mundial, clave para la transición energética.</span>
+                    </li>
+                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
+                        <span class="text-yellow-400 mr-3 text-xl">⚓</span>
+                        <span><strong>Ubicación:</strong> Acceso directo al Atlántico y el Caribe (El "Nodo").</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="glass-card p-6 rounded-xl shadow-2xl">
+                <h3 class="text-lg md:text-xl text-center mb-6 text-cyan-400 font-bold tracking-wider uppercase">Reservas Probadas (Miles de Millones de Barriles)</h3>
+                <div class="chart-container">
+                    <canvas id="reservesChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-slate-500 mt-4">El tamaño de la barra representa el poder estratégico potencial.</p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: EL COLAPSO (Temporadas 2, 3, 4) -->
+        <section id="season-2-4" class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gradient-to-br from-slate-900 to-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
+            <!-- Elemento decorativo de fondo -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl -z-10"></div>
+
+            <div class="lg:col-span-4 space-y-6 z-10">
+                <div class="flex items-center space-x-4">
+                    <span class="bg-red-600 text-white font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(220,38,38,0.5)]">T2-T4</span>
+                    <h2 class="text-3xl cinematic-title text-white">El Colapso y El Éxodo</h2>
+                </div>
+                <p class="text-slate-300 text-sm md:text-base">
+                    La destrucción de PDVSA y las sanciones crearon una tormenta perfecta. Mientras la producción caía en picada, el capital humano huía. Un vaciamiento institucional que dio paso a economías de sombra.
+                </p>
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-slate-950 p-4 rounded border-l-4 border-red-500">
+                        <div class="text-2xl md:text-3xl font-bold text-white">-75%</div>
+                        <div class="text-xs text-slate-400 uppercase tracking-wide">Caída del PIB</div>
+                    </div>
+                    <div class="bg-slate-950 p-4 rounded border-l-4 border-yellow-500">
+                        <div class="text-2xl md:text-3xl font-bold text-white">7.7M+</div>
+                        <div class="text-xs text-slate-400 uppercase tracking-wide">Diáspora</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 glass-card p-4 md:p-6 rounded-xl z-10">
+                <h3 class="text-lg text-center mb-6 text-red-400 font-bold tracking-wider uppercase">Correlación Inversa: Producción vs. Migración</h3>
+                <div class="chart-container">
+                    <canvas id="collapseChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: EL GIRO ESTRATÉGICO (Temporada 5) -->
+        <section id="season-5" class="space-y-12">
+            <div class="text-center max-w-3xl mx-auto space-y-4">
+                <span class="bg-cyan-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(34,211,238,0.5)]">T5</span>
+                <h2 class="text-4xl cinematic-title text-white">El Punto de Inflexión</h2>
+                <p class="text-lg text-slate-300">
+                    "Control sin Invasión". La seguridad energética cambia el cálculo global. Venezuela pasa de ser un estado paria a un mal necesario para Occidente.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="glass-card p-6 rounded-xl order-2 md:order-1">
+                    <h3 class="text-xl text-center mb-4 text-cyan-400 font-bold uppercase">Matriz de Influencia</h3>
+                    <div class="chart-container">
+                        <canvas id="geopoliticsChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-slate-500 mt-4">Competencia por el control de activos clave</p>
+                </div>
+
+                <div class="space-y-8 order-1 md:order-2">
+                    <h3 class="text-2xl text-white font-bold border-b border-cyan-500 pb-2 inline-block">El Nuevo Mapa Energético</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start group">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-slate-800 border border-cyan-500 flex items-center justify-center text-cyan-400 font-bold group-hover:bg-cyan-500 group-hover:text-black transition-colors">1</div>
+                            <div class="ml-4">
+                                <h4 class="text-white font-bold text-lg">Pragmatismo vs. Ideología</h4>
+                                <p class="text-sm text-slate-400 mt-1">EE. UU. necesita crudo pesado para sus refinerías. La ideología pasa a segundo plano ante la seguridad de suministro.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start group">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-slate-800 border border-red-500 flex items-center justify-center text-red-400 font-bold group-hover:bg-red-500 group-hover:text-white transition-colors">2</div>
+                            <div class="ml-4">
+                                <h4 class="text-white font-bold text-lg">Contención Oriental</h4>
+                                <p class="text-sm text-slate-400 mt-1">Recuperar el mercado venezolano es vital para evitar una base de operaciones definitiva de rivales del Este en el Caribe.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: RECONSTRUCCIÓN (Temporada 6) -->
+        <section id="season-6" class="bg-gradient-to-t from-slate-950 to-slate-900 p-8 md:p-16 rounded-3xl shadow-2xl border-t border-slate-800">
+            <div class="text-center mb-16">
+                <span class="bg-green-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(34,197,94,0.5)]">T6</span>
+                <h2 class="text-4xl cinematic-title text-white mt-4">El Plan Marshall Tropical</h2>
+                <p class="text-slate-300 mt-4 max-w-2xl mx-auto italic">
+                    "Primero las reglas, luego el país."
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                <!-- Línea conectora (Desktop) -->
+                <div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-slate-700 via-green-500 to-slate-700 -z-10"></div>
+
+                <!-- Fase 1 -->
+                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-green-500 transition-all shadow-lg group hover:-translate-y-2">
+                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-green-500 group-hover:text-green-500 text-slate-400 font-bold mx-auto md:mx-0">I</div>
+                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Estabilización</h3>
+                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Marco jurídico para proteger inversiones.</p>
+                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
+                        <div class="h-full bg-green-500 w-1/3"></div>
+                    </div>
+                </div>
+
+                <!-- Fase 2 -->
+                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-yellow-500 transition-all shadow-lg group hover:-translate-y-2">
+                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-yellow-500 group-hover:text-yellow-500 text-slate-400 font-bold mx-auto md:mx-0">II</div>
+                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Infraestructura</h3>
+                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Recuperación eléctrica y portuaria.</p>
+                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
+                        <div class="h-full bg-yellow-500 w-2/3"></div>
+                    </div>
+                </div>
+
+                <!-- Fase 3 -->
+                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-blue-500 transition-all shadow-lg group hover:-translate-y-2">
+                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-blue-500 group-hover:text-blue-500 text-slate-400 font-bold mx-auto md:mx-0">III</div>
+                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Reinserción</h3>
+                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Hub energético y retorno de capital.</p>
+                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
+                        <div class="h-full bg-blue-500 w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEMPORADA FINAL -->
+        <section class="text-center py-24 px-6 relative overflow-hidden">
+            <!-- Fondo degradado final -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-slate-900 to-transparent z-0"></div>
+            
+            <div class="relative z-10 max-w-4xl mx-auto animate-pulse-slow">
+                <span class="text-xs tracking-[0.5em] text-slate-500 uppercase">Episodio Final</span>
+                <h2 class="text-5xl md:text-7xl font-bold text-white mb-8 mt-4 leading-tight">"NUNCA FUE IDEOLOGÍA"</h2>
+                <div class="w-32 h-1 bg-white mx-auto mb-8 opacity-20"></div>
+                <p class="text-2xl text-slate-300 font-light italic mb-12">
+                    Fue recursos. Fue ubicación. Fue poder.
+                </p>
+                
+                <div class="inline-block p-0.5 bg-gradient-to-r from-yellow-500 to-red-600 rounded-lg transform hover:scale-105 transition-transform cursor-default">
+                    <div class="bg-black px-8 py-4 rounded font-mono text-white tracking-widest">
+                        FIN DE LA SERIE
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-black text-slate-600 py-12 text-center text-sm border-t border-slate-900">
+        <p class="mb-2 font-bold text-slate-500">NETFLIX ORIGINAL CONCEPT</p>
+        <p>Basado en el documento "Serie de Netflix - Venezuela.pdf"</p>
+        <p class="mt-4 text-xs opacity-50">Generado con IA • Chart.js • Tailwind CSS</p>
+    </footer>
+
+    <!-- CONFIGURACIÓN DE GRÁFICOS (JavaScript) -->
+    <script>
+        // --- UTILIDADES ---
+        // Función para dividir etiquetas largas en varias líneas
+        function splitLabel(label, maxLength = 16) {
+            if (label.length <= maxLength) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + " " + words[i]).length < maxLength) {
+                    currentLine += " " + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // Configuración Global de Chart.js
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Roboto', sans-serif";
+        Chart.defaults.scale.grid.color = '#334155';
+        
+        // Tooltip para manejar etiquetas multilínea
+        const tooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- CHART 1: RESERVAS DE PETRÓLEO (Barras) ---
+        const ctxReserves = document.getElementById('reservesChart').getContext('2d');
+        const reservesData = {
+            labels: ['Venezuela', 'Arabia Saudita', 'Canadá', 'Irán', 'Irak'],
+            datasets: [{
+                label: 'Reservas (Miles de Millones de Barriles)',
+                data: [304, 298, 170, 156, 145],
+                backgroundColor: [
+                    '#fbbf24', // Oro Venezuela (Destacado)
+                    '#475569', // Slate
+                    '#475569',
+                    '#475569',
+                    '#475569'
+                ],
+                borderWidth: 0,
+                borderRadius: 4,
+                barPercentage: 0.7
+            }]
+        };
+        reservesData.labels = reservesData.labels.map(l => splitLabel(l));
+
+        new Chart(ctxReserves, {
+            type: 'bar',
+            data: reservesData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Barra horizontal
+                plugins: {
+                    legend: { display: false },
+                    tooltip: tooltipConfig
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- CHART 2: EL COLAPSO (Línea Doble Eje) ---
+        const ctxCollapse = document.getElementById('collapseChart').getContext('2d');
+        
+        new Chart(ctxCollapse, {
+            type: 'line',
+            data: {
+                labels: ['2012', '2014', '2016', '2018', '2020', '2022'],
+                datasets: [
+                    {
+                        label: 'Producción Petrolera (M bpd)',
+                        data: [2.8, 2.4, 2.1, 1.4, 0.5, 0.7],
+                        borderColor: '#fbbf24', // Oro
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        yAxisID: 'y',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'Migración Acumulada (Millones)',
+                        data: [0.5, 1.2, 2.3, 4.0, 5.4, 7.7],
+                        borderColor: '#ef4444', // Rojo
+                        backgroundColor: 'transparent',
+                        yAxisID: 'y1',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    tooltip: tooltipConfig,
+                    legend: {
+                        position: 'top',
+                        labels: { color: '#e2e8f0', usePointStyle: true }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Producción (M bpd)', color: '#fbbf24' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: { display: true, text: 'Migrantes (Millones)', color: '#ef4444' },
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // --- CHART 3: GEOPOLÍTICA (Radar) ---
+        const ctxGeo = document.getElementById('geopoliticsChart').getContext('2d');
+        
+        new Chart(ctxGeo, {
+            type: 'radar',
+            data: {
+                labels: ['Finanzas/Deuda', 'Militar', 'Infraestructura', 'Energía', 'Diplomacia'],
+                datasets: [
+                    {
+                        label: 'China',
+                        data: [90, 20, 80, 70, 60],
+                        fill: true,
+                        backgroundColor: 'rgba(34, 211, 238, 0.1)', // Cyan
+                        borderColor: '#22d3ee',
+                        pointBackgroundColor: '#22d3ee',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Rusia',
+                        data: [40, 90, 30, 85, 50],
+                        fill: true,
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)', // Red
+                        borderColor: '#ef4444',
+                        pointBackgroundColor: '#ef4444',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'EE. UU. (Interés)',
+                        data: [30, 10, 20, 95, 40],
+                        fill: true,
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)', // Gold
+                        borderColor: '#fbbf24',
+                        pointBackgroundColor: '#fbbf24',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: { borderWidth: 2 }
+                },
+                plugins: {
+                    tooltip: tooltipConfig,
+                    legend: { position: 'bottom', labels: { boxWidth: 10, padding: 20 } }
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        pointLabels: {
+                            color: '#e2e8f0',
+                            font: { size: 12 }
+                        },
+                        ticks: { display: false, backdropColor: 'transparent' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
