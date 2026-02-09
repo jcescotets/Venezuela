@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Office — Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0f1c; color: #e2e8f0; }
+        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(100, 116, 139, 0.2); }
+        .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
+        .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+        .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
+        .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
+        .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-veto { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .sidebar { width: 260px; min-height: 100vh; }
+        .content { margin-left: 260px; }
+        .metric-card { transition: transform 0.2s; }
+        .metric-card:hover { transform: translateY(-2px); }
+        @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<!-- Sidebar -->
+<aside class="sidebar fixed top-0 left-0 glass border-r border-slate-700/50 p-4 z-50">
+    <div class="mb-8">
+        <h1 class="text-lg font-bold text-white">Family Office</h1>
+        <p class="text-xs text-slate-400 mt-1">Sistema Agéntico v1.0</p>
+    </div>
+
+    <nav class="space-y-1">
+        <a href="#" onclick="showSection('overview')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Overview
+        </a>
+        <a href="#" onclick="showSection('portfolio')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Portfolio
+        </a>
+        <a href="#" onclick="showSection('markets')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Mercados
+        </a>
+        <a href="#" onclick="showSection('organization')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Organización
+        </a>
+        <a href="#" onclick="showSection('decisions')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Decisiones
+        </a>
+        <a href="#" onclick="showSection('analysis')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
+            ◈ Nuevo Análisis
+        </a>
+    </nav>
+
+    <div class="mt-8 p-3 glass rounded-lg">
+        <p class="text-xs text-slate-400 mb-1">Principal</p>
+        <p class="text-sm font-medium text-white">J. Escotets</p>
+        <p class="text-xs text-slate-500">Residencia: España</p>
+    </div>
+
+    <div class="mt-4 p-3 glass rounded-lg">
+        <p class="text-xs text-slate-400 mb-2">Agentes Activos</p>
+        <div id="sidebar-agent-count" class="text-2xl font-bold text-green-400">--</div>
+        <div class="flex items-center gap-1 mt-1">
+            <span class="w-2 h-2 rounded-full bg-green-400 pulse-slow"></span>
+            <span class="text-xs text-slate-400">Sistema operativo</span>
+        </div>
+    </div>
+</aside>
+
+<!-- Main Content -->
+<main class="content p-6">
+
+    <!-- OVERVIEW SECTION -->
+    <section id="section-overview">
+        <h2 class="text-2xl font-bold text-white mb-6">Overview</h2>
+
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass rounded-xl p-4 metric-card glow-green">
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Valor Portfolio</p>
+                <p id="portfolio-value" class="text-2xl font-bold text-green-400 mt-1">--</p>
+                <p id="portfolio-change" class="text-xs text-slate-400 mt-1"></p>
+            </div>
+            <div class="glass rounded-xl p-4 metric-card glow-blue">
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Posiciones</p>
+                <p id="position-count" class="text-2xl font-bold text-blue-400 mt-1">--</p>
+                <p class="text-xs text-slate-400 mt-1">Activos en portfolio</p>
+            </div>
+            <div class="glass rounded-xl p-4 metric-card glow-amber">
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Decisiones Pendientes</p>
+                <p id="pending-decisions" class="text-2xl font-bold text-amber-400 mt-1">--</p>
+                <p class="text-xs text-slate-400 mt-1">Requieren acción</p>
+            </div>
+            <div class="glass rounded-xl p-4 metric-card glow-red">
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Vetos Activos</p>
+                <p id="active-vetoes" class="text-2xl font-bold text-red-400 mt-1">0</p>
+                <p class="text-xs text-slate-400 mt-1">Bloqueos vigentes</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="glass rounded-xl p-6">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignación por Clase de Activo</h3>
+                <canvas id="chart-allocation-class" height="200"></canvas>
+            </div>
+            <div class="glass rounded-xl p-6">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignación por Jurisdicción</h3>
+                <canvas id="chart-allocation-jurisdiction" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Market Snapshot -->
+        <div class="glass rounded-xl p-6">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Mercados en Tiempo Real</h3>
+            <div id="market-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <p class="text-sm text-slate-500">Cargando datos de mercado...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- PORTFOLIO SECTION -->
+    <section id="section-portfolio" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Portfolio</h2>
+        <div class="glass rounded-xl p-6">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="text-left py-3 px-4 text-slate-400 font-medium">Activo</th>
+                            <th class="text-left py-3 px-4 text-slate-400 font-medium">Clase</th>
+                            <th class="text-left py-3 px-4 text-slate-400 font-medium">Jurisdicción</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-medium">Cantidad</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-medium">Valor (USD)</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-medium">% Portfolio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="portfolio-table">
+                        <tr><td colspan="6" class="py-4 text-center text-slate-500">Portfolio vacío — agrega activos desde la API</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add Asset Form -->
+        <div class="glass rounded-xl p-6 mt-6">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Agregar Activo</h3>
+            <form id="add-asset-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input name="name" placeholder="Nombre" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <input name="ticker" placeholder="Ticker (opcional)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                <select name="asset_class" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                    <option>Renta Variable</option>
+                    <option>Renta Fija</option>
+                    <option>Real Assets</option>
+                    <option>Alternativos</option>
+                    <option>Cash</option>
+                    <option>Crypto</option>
+                </select>
+                <input name="jurisdiction" placeholder="Jurisdicción" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <input name="quantity" type="number" step="any" placeholder="Cantidad" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <input name="cost_basis_usd" type="number" step="any" placeholder="Coste (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <input name="current_value_usd" type="number" step="any" placeholder="Valor actual (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <div></div>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition">
+                    Agregar Activo
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- MARKETS SECTION -->
+    <section id="section-markets" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Mercados</h2>
+        <div id="markets-detail" class="glass rounded-xl p-6">
+            <p class="text-sm text-slate-500">Cargando datos macro...</p>
+        </div>
+    </section>
+
+    <!-- ORGANIZATION SECTION -->
+    <section id="section-organization" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Organización Agéntica</h2>
+        <div id="org-chart" class="space-y-6"></div>
+    </section>
+
+    <!-- DECISIONS SECTION -->
+    <section id="section-decisions" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Historial de Decisiones</h2>
+        <div id="decisions-list" class="space-y-4">
+            <p class="text-sm text-slate-500">Sin decisiones registradas aún.</p>
+        </div>
+    </section>
+
+    <!-- NEW ANALYSIS SECTION -->
+    <section id="section-analysis" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Nuevo Análisis de Inversión</h2>
+        <div class="glass rounded-xl p-6">
+            <form id="analysis-form" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Título</label>
+                        <input name="title" placeholder="Ej: Inversión en S&P 500 ETF" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Clase de activo</label>
+                        <select name="asset_class" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1">
+                            <option>Renta Variable</option>
+                            <option>Renta Fija</option>
+                            <option>Real Assets</option>
+                            <option>Alternativos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Monto (USD)</label>
+                        <input name="amount_usd" type="number" step="any" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Retorno bruto esperado (%)</label>
+                        <input name="expected_gross_return_pct" type="number" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Horizonte (meses)</label>
+                        <input name="time_horizon_months" type="number" value="12" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 uppercase">Jurisdicción</label>
+                        <input name="jurisdiction" placeholder="Ej: Estados Unidos" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 uppercase">Descripción</label>
+                    <textarea name="description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" placeholder="Describe la inversión..."></textarea>
+                </div>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition">
+                    Lanzar Análisis Completo
+                </button>
+            </form>
+            <div id="analysis-result" class="mt-6 hidden">
+                <pre class="bg-slate-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// Navigation
+// ═══════════════════════════════════════════════════════
+function showSection(name) {
+    document.querySelectorAll('section[id^="section-"]').forEach(s => s.classList.add('hidden'));
+    document.getElementById('section-' + name).classList.remove('hidden');
+}
+
+// ═══════════════════════════════════════════════════════
+// API calls
+// ═══════════════════════════════════════════════════════
+async function fetchJSON(url) {
+    try {
+        const r = await fetch(url);
+        return await r.json();
+    } catch (e) {
+        console.error('Fetch error:', url, e);
+        return null;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// Load Overview
+// ═══════════════════════════════════════════════════════
+async function loadOverview() {
+    // Portfolio
+    const portfolio = await fetchJSON('/api/portfolio');
+    if (portfolio) {
+        const val = portfolio.total_value_usd || 0;
+        document.getElementById('portfolio-value').textContent =
+            val > 0 ? 'USD ' + val.toLocaleString('en-US', {minimumFractionDigits: 0}) : 'Sin activos';
+        document.getElementById('position-count').textContent =
+            (portfolio.assets || []).length;
+
+        // Charts
+        if (portfolio.allocation_by_class && Object.keys(portfolio.allocation_by_class).length) {
+            renderPieChart('chart-allocation-class', portfolio.allocation_by_class);
+        }
+        if (portfolio.allocation_by_jurisdiction && Object.keys(portfolio.allocation_by_jurisdiction).length) {
+            renderPieChart('chart-allocation-jurisdiction', portfolio.allocation_by_jurisdiction);
+        }
+    }
+
+    // Organization
+    const org = await fetchJSON('/api/organization');
+    if (org) {
+        document.getElementById('sidebar-agent-count').textContent = org.agent_count;
+        renderOrgChart(org.agents);
+    }
+
+    // Decisions
+    const decisions = await fetchJSON('/api/decisions');
+    if (decisions) {
+        document.getElementById('pending-decisions').textContent =
+            decisions.filter(d => d.status === 'awaiting_user' || d.status === 'pending').length;
+        renderDecisions(decisions);
+    }
+
+    // Markets
+    const macro = await fetchJSON('/api/market/macro');
+    if (macro && macro.markets) {
+        renderMarketGrid(macro.markets);
+        renderMarketsDetail(macro);
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// Charts
+// ═══════════════════════════════════════════════════════
+const chartColors = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+
+function renderPieChart(canvasId, data) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data).map(v => parseFloat(v.toFixed(1))),
+                backgroundColor: chartColors,
+                borderWidth: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 } } },
+            }
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════
+// Market Grid
+// ═══════════════════════════════════════════════════════
+function renderMarketGrid(markets) {
+    const grid = document.getElementById('market-grid');
+    grid.innerHTML = '';
+    const names = {
+        sp500: 'S&P 500', nasdaq: 'Nasdaq', euro_stoxx50: 'Euro Stoxx 50',
+        ibex35: 'IBEX 35', vix: 'VIX', gold: 'Oro', wti_oil: 'Petróleo WTI',
+        btc_usd: 'Bitcoin', eur_usd: 'EUR/USD'
+    };
+    for (const [key, val] of Object.entries(markets)) {
+        if (!val.price) continue;
+        const change = val.change_pct || 0;
+        const color = change >= 0 ? 'text-green-400' : 'text-red-400';
+        const arrow = change >= 0 ? '▲' : '▼';
+        grid.innerHTML += `
+            <div class="glass rounded-lg p-3">
+                <p class="text-xs text-slate-400">${names[key] || key}</p>
+                <p class="text-sm font-semibold text-white">${parseFloat(val.price).toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                <p class="text-xs ${color}">${arrow} ${Math.abs(change).toFixed(2)}%</p>
+            </div>`;
+    }
+}
+
+// ═══════════════════════════════════════════════════════
+// Markets Detail
+// ═══════════════════════════════════════════════════════
+function renderMarketsDetail(macro) {
+    const el = document.getElementById('markets-detail');
+    let html = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+
+    if (macro.us && Object.keys(macro.us).length) {
+        html += '<div><h3 class="text-sm font-semibold text-slate-300 mb-3">Indicadores US (FRED)</h3><div class="space-y-2">';
+        for (const [key, val] of Object.entries(macro.us)) {
+            html += `<div class="flex justify-between text-sm"><span class="text-slate-400">${key}</span><span class="text-white font-medium">${val.value}</span></div>`;
+        }
+        html += '</div></div>';
+    }
+
+    if (macro.markets) {
+        html += '<div><h3 class="text-sm font-semibold text-slate-300 mb-3">Mercados Globales</h3><div class="space-y-2">';
+        for (const [key, val] of Object.entries(macro.markets)) {
+            if (!val.price) continue;
+            const change = val.change_pct || 0;
+            const color = change >= 0 ? 'text-green-400' : 'text-red-400';
+            html += `<div class="flex justify-between text-sm"><span class="text-slate-400">${key}</span><span class="text-white font-medium">${parseFloat(val.price).toLocaleString()}</span><span class="${color}">${change >= 0 ? '+' : ''}${change.toFixed(2)}%</span></div>`;
+        }
+        html += '</div></div>';
+    }
+
+    html += '</div>';
+    el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// Organization Chart
+// ═══════════════════════════════════════════════════════
+function renderOrgChart(agents) {
+    const el = document.getElementById('org-chart');
+    const layers = {};
+    agents.forEach(a => {
+        if (!layers[a.layer]) layers[a.layer] = [];
+        layers[a.layer].push(a);
+    });
+
+    const layerNames = {
+        direction: 'Dirección', analysis: 'Análisis',
+        fiscal: 'Fiscalidad & Legal', risk: 'Riesgo & Control',
+        operations: 'Operaciones'
+    };
+    const layerColors = {
+        direction: 'border-blue-500', analysis: 'border-green-500',
+        fiscal: 'border-amber-500', risk: 'border-red-500',
+        operations: 'border-purple-500'
+    };
+
+    let html = '';
+    for (const [layer, list] of Object.entries(layers)) {
+        html += `<div class="glass rounded-xl p-4 border-l-4 ${layerColors[layer] || 'border-slate-500'}">`;
+        html += `<h3 class="text-sm font-semibold text-white mb-3">${layerNames[layer] || layer} (${list.length})</h3>`;
+        html += '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">';
+        list.forEach(a => {
+            const vetoBadge = a.has_veto ? '<span class="status-badge status-veto ml-2">VETO</span>' : '';
+            html += `<div class="bg-slate-800/50 rounded-lg p-3">
+                <p class="text-sm font-medium text-white">${a.name}${vetoBadge}</p>
+                <p class="text-xs text-slate-400 mt-1">${a.specialty}</p>
+            </div>`;
+        });
+        html += '</div></div>';
+    }
+    el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// Decisions
+// ═══════════════════════════════════════════════════════
+function renderDecisions(decisions) {
+    const el = document.getElementById('decisions-list');
+    if (!decisions.length) return;
+
+    let html = '';
+    decisions.forEach(d => {
+        const statusClass = d.status === 'approved' ? 'status-active' :
+            d.status === 'vetoed' ? 'status-veto' : 'status-pending';
+        html += `<div class="glass rounded-xl p-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm font-medium text-white">${d.title}</p>
+                    <p class="text-xs text-slate-400 mt-1">USD ${(d.amount_usd || 0).toLocaleString()}</p>
+                </div>
+                <span class="status-badge ${statusClass}">${d.status}</span>
+            </div>
+        </div>`;
+    });
+    el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
+// Forms
+// ═══════════════════════════════════════════════════════
+document.getElementById('add-asset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd);
+    data.quantity = parseFloat(data.quantity);
+    data.cost_basis_usd = parseFloat(data.cost_basis_usd);
+    data.current_value_usd = parseFloat(data.current_value_usd);
+
+    const r = await fetch('/api/portfolio/asset', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    if (r.ok) { e.target.reset(); loadOverview(); }
+});
+
+document.getElementById('analysis-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd);
+    data.amount_usd = parseFloat(data.amount_usd);
+    data.expected_gross_return_pct = parseFloat(data.expected_gross_return_pct);
+    data.time_horizon_months = parseInt(data.time_horizon_months);
+
+    const resultEl = document.getElementById('analysis-result');
+    resultEl.classList.remove('hidden');
+    resultEl.querySelector('pre').textContent = 'Ejecutando análisis completo... Los agentes están trabajando.';
+
+    const r = await fetch('/api/analyze', {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+
+    if (r.ok) {
+        const result = await r.json();
+        resultEl.querySelector('pre').textContent = result.report || JSON.stringify(result, null, 2);
+    } else {
+        resultEl.querySelector('pre').textContent = 'Error: ' + (await r.text());
+    }
+});
+
+// ═══════════════════════════════════════════════════════
+// Init
+// ═══════════════════════════════════════════════════════
+loadOverview();
+setInterval(loadOverview, 60000); // Refresh every 60s
+</script>
+
+</body>
+</html>
