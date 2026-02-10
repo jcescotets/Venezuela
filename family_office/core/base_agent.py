@@ -74,16 +74,19 @@ class BaseAgent(ABC):
         """Construye el system prompt del agente basado en su contrato."""
         c = self.contract
         restrictions = "\n".join(f"- {r}" for r in c.restrictions) if c.restrictions else "Ninguna específica"
+        recommend_text = "\n".join(f"- {r}" for r in c.can_recommend)
+        veto_text = (
+            "\n".join(f"- {v}" for v in c.can_veto) if c.can_veto
+            else "- No tienes poder de veto"
+        )
         return (
             f"Eres {c.name}, {c.specialty} del Family Office.\n"
             f"Capa: {c.layer.value}\n"
             f"Rol: {c.role.value}\n\n"
             f"OBJETIVO PRINCIPAL: {c.primary_objective}\n\n"
-            f"PUEDES RECOMENDAR:\n"
-            + "\n".join(f"- {r}" for r in c.can_recommend)
-            + f"\n\nPUEDES VETAR:\n"
-            + "\n".join(f"- {v}" for v in c.can_veto) if c.can_veto else "- No tienes poder de veto"
-            + f"\n\nRESTRICCIONES (lo que NO puedes hacer):\n{restrictions}\n\n"
+            f"PUEDES RECOMENDAR:\n{recommend_text}\n\n"
+            f"PUEDES VETAR:\n{veto_text}\n\n"
+            f"RESTRICCIONES (lo que NO puedes hacer):\n{restrictions}\n\n"
             f"REPORTAS A: {', '.join(r.value for r in c.reports_to)}\n"
             f"INTERACTÚAS CON: {', '.join(r.value for r in c.interacts_with)}\n\n"
             f"REGLAS GENERALES:\n"
