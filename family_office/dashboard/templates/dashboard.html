@@ -3,83 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Office — Dashboard</title>
+    <title>Family Office — Dashboard v2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background: #0a0f1c; color: #e2e8f0; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(100, 116, 139, 0.2); }
+        .glass-hover:hover { background: rgba(15, 23, 42, 0.95); border-color: rgba(100, 116, 139, 0.4); }
         .glow-green { box-shadow: 0 0 20px rgba(34, 197, 94, 0.15); }
         .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
         .glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.15); }
         .glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
-        .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); }
+        .status-badge { padding: 2px 8px; border-radius: 9999px; font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
         .status-active { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
         .status-veto { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
         .status-pending { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        .sidebar { width: 260px; min-height: 100vh; }
+        .status-analyzing { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .sidebar { width: 260px; min-height: 100vh; transition: width 0.3s; }
         .content { margin-left: 260px; }
-        .metric-card { transition: transform 0.2s; }
+        .metric-card { transition: transform 0.2s, box-shadow 0.2s; }
         .metric-card:hover { transform: translateY(-2px); }
         @keyframes pulse-slow { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
         .pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
+        @keyframes slide-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slide-in 0.3s ease-out; }
+        .progress-bar { transition: width 0.5s ease-in-out; }
+        .nav-active { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border-left: 3px solid #3b82f6; }
+        .toast { position: fixed; bottom: 24px; right: 24px; z-index: 100; }
+        .pipeline-phase { transition: all 0.3s; }
+        .pipeline-phase.active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+        .pipeline-phase.done { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); }
+        .pipeline-phase.error { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
     </style>
 </head>
 <body class="min-h-screen">
 
+<!-- Toast container -->
+<div id="toast-container" class="toast space-y-2"></div>
+
 <!-- Sidebar -->
-<aside class="sidebar fixed top-0 left-0 glass border-r border-slate-700/50 p-4 z-50">
-    <div class="mb-8">
-        <h1 class="text-lg font-bold text-white">Family Office</h1>
-        <p class="text-xs text-slate-400 mt-1">Sistema Agéntico v1.0</p>
+<aside class="sidebar fixed top-0 left-0 glass border-r border-slate-700/50 p-4 z-50 flex flex-col">
+    <div class="mb-6">
+        <h1 class="text-lg font-bold text-white tracking-tight">Family Office</h1>
+        <p class="text-xs text-slate-400 mt-1">Sistema Agentico v2.0</p>
     </div>
 
-    <nav class="space-y-1">
-        <a href="#" onclick="showSection('overview')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Overview
+    <nav class="space-y-0.5 flex-1">
+        <a href="#" onclick="showSection('overview')" data-nav="overview" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Overview
         </a>
-        <a href="#" onclick="showSection('portfolio')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Portfolio
+        <a href="#" onclick="showSection('portfolio')" data-nav="portfolio" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Portfolio
         </a>
-        <a href="#" onclick="showSection('markets')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Mercados
+        <a href="#" onclick="showSection('markets')" data-nav="markets" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Mercados
         </a>
-        <a href="#" onclick="showSection('organization')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Organización
+        <a href="#" onclick="showSection('organization')" data-nav="organization" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Organizacion
         </a>
-        <a href="#" onclick="showSection('decisions')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Decisiones
+        <a href="#" onclick="showSection('pipeline')" data-nav="pipeline" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Pipeline
         </a>
-        <a href="#" onclick="showSection('analysis')" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition">
-            ◈ Nuevo Análisis
+        <a href="#" onclick="showSection('decisions')" data-nav="decisions" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Decisiones
+        </a>
+        <a href="#" onclick="showSection('memory')" data-nav="memory" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Memoria
+        </a>
+        <a href="#" onclick="showSection('analysis')" data-nav="analysis" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Nuevo Analisis
+        </a>
+        <a href="#" onclick="showSection('audit')" data-nav="audit" class="nav-link block px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition">
+            <span class="mr-2 opacity-70">&#9670;</span> Auditoria
         </a>
     </nav>
 
-    <div class="mt-8 p-3 glass rounded-lg">
-        <p class="text-xs text-slate-400 mb-1">Principal</p>
-        <p class="text-sm font-medium text-white">J. Escotets</p>
-        <p class="text-xs text-slate-500">Residencia: España</p>
-    </div>
+    <div class="mt-auto space-y-3">
+        <div class="p-3 glass rounded-lg">
+            <p class="text-xs text-slate-400 mb-1">Principal</p>
+            <p class="text-sm font-medium text-white">J. Escotets</p>
+            <p class="text-xs text-slate-500">Residencia: Espana</p>
+        </div>
 
-    <div class="mt-4 p-3 glass rounded-lg">
-        <p class="text-xs text-slate-400 mb-2">Agentes Activos</p>
-        <div id="sidebar-agent-count" class="text-2xl font-bold text-green-400">--</div>
-        <div class="flex items-center gap-1 mt-1">
-            <span class="w-2 h-2 rounded-full bg-green-400 pulse-slow"></span>
-            <span class="text-xs text-slate-400">Sistema operativo</span>
+        <div class="p-3 glass rounded-lg">
+            <p class="text-xs text-slate-400 mb-2">Agentes Activos</p>
+            <div id="sidebar-agent-count" class="text-2xl font-bold text-green-400">--</div>
+            <div class="flex items-center gap-1 mt-1">
+                <span id="ws-indicator" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                <span id="ws-status" class="text-xs text-slate-400">Conectando...</span>
+            </div>
         </div>
     </div>
 </aside>
 
 <!-- Main Content -->
-<main class="content p-6">
+<main class="content p-6 min-h-screen">
 
     <!-- OVERVIEW SECTION -->
-    <section id="section-overview">
-        <h2 class="text-2xl font-bold text-white mb-6">Overview</h2>
+    <section id="section-overview" class="slide-in">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-white">Overview</h2>
+            <span id="health-badge" class="status-badge status-pending">Cargando...</span>
+        </div>
 
         <!-- Metric Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -96,7 +129,7 @@
             <div class="glass rounded-xl p-4 metric-card glow-amber">
                 <p class="text-xs text-slate-400 uppercase tracking-wide">Decisiones Pendientes</p>
                 <p id="pending-decisions" class="text-2xl font-bold text-amber-400 mt-1">--</p>
-                <p class="text-xs text-slate-400 mt-1">Requieren acción</p>
+                <p class="text-xs text-slate-400 mt-1">Requieren accion</p>
             </div>
             <div class="glass rounded-xl p-4 metric-card glow-red">
                 <p class="text-xs text-slate-400 uppercase tracking-wide">Vetos Activos</p>
@@ -108,11 +141,11 @@
         <!-- Charts Row -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="glass rounded-xl p-6">
-                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignación por Clase de Activo</h3>
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignacion por Clase de Activo</h3>
                 <canvas id="chart-allocation-class" height="200"></canvas>
             </div>
             <div class="glass rounded-xl p-6">
-                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignación por Jurisdicción</h3>
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Asignacion por Jurisdiccion</h3>
                 <canvas id="chart-allocation-jurisdiction" height="200"></canvas>
             </div>
         </div>
@@ -129,6 +162,23 @@
     <!-- PORTFOLIO SECTION -->
     <section id="section-portfolio" class="hidden">
         <h2 class="text-2xl font-bold text-white mb-6">Portfolio</h2>
+
+        <!-- Portfolio Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="glass rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase">Valor Total</p>
+                <p id="port-total-value" class="text-xl font-bold text-green-400 mt-1">--</p>
+            </div>
+            <div class="glass rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase">P&L No Realizado</p>
+                <p id="port-unrealized-pnl" class="text-xl font-bold text-white mt-1">--</p>
+            </div>
+            <div class="glass rounded-xl p-4">
+                <p class="text-xs text-slate-400 uppercase">Num. Posiciones</p>
+                <p id="port-position-count" class="text-xl font-bold text-blue-400 mt-1">--</p>
+            </div>
+        </div>
+
         <div class="glass rounded-xl p-6">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -136,14 +186,16 @@
                         <tr class="border-b border-slate-700">
                             <th class="text-left py-3 px-4 text-slate-400 font-medium">Activo</th>
                             <th class="text-left py-3 px-4 text-slate-400 font-medium">Clase</th>
-                            <th class="text-left py-3 px-4 text-slate-400 font-medium">Jurisdicción</th>
+                            <th class="text-left py-3 px-4 text-slate-400 font-medium">Jurisdiccion</th>
                             <th class="text-right py-3 px-4 text-slate-400 font-medium">Cantidad</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-medium">Coste (USD)</th>
                             <th class="text-right py-3 px-4 text-slate-400 font-medium">Valor (USD)</th>
+                            <th class="text-right py-3 px-4 text-slate-400 font-medium">P&L</th>
                             <th class="text-right py-3 px-4 text-slate-400 font-medium">% Portfolio</th>
                         </tr>
                     </thead>
                     <tbody id="portfolio-table">
-                        <tr><td colspan="6" class="py-4 text-center text-slate-500">Portfolio vacío — agrega activos desde la API</td></tr>
+                        <tr><td colspan="8" class="py-4 text-center text-slate-500">Portfolio vacio</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -153,8 +205,8 @@
         <div class="glass rounded-xl p-6 mt-6">
             <h3 class="text-sm font-semibold text-slate-300 mb-4">Agregar Activo</h3>
             <form id="add-asset-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input name="name" placeholder="Nombre" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
-                <input name="ticker" placeholder="Ticker (opcional)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                <input name="name" placeholder="Nombre" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none" required>
+                <input name="ticker" placeholder="Ticker (opcional)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none">
                 <select name="asset_class" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
                     <option>Renta Variable</option>
                     <option>Renta Fija</option>
@@ -163,10 +215,10 @@
                     <option>Cash</option>
                     <option>Crypto</option>
                 </select>
-                <input name="jurisdiction" placeholder="Jurisdicción" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
-                <input name="quantity" type="number" step="any" placeholder="Cantidad" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
-                <input name="cost_basis_usd" type="number" step="any" placeholder="Coste (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
-                <input name="current_value_usd" type="number" step="any" placeholder="Valor actual (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" required>
+                <input name="jurisdiction" placeholder="Jurisdiccion" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none" required>
+                <input name="quantity" type="number" step="any" placeholder="Cantidad" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none" required>
+                <input name="cost_basis_usd" type="number" step="any" placeholder="Coste (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none" required>
+                <input name="current_value_usd" type="number" step="any" placeholder="Valor actual (USD)" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none" required>
                 <div></div>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition">
                     Agregar Activo
@@ -181,31 +233,131 @@
         <div id="markets-detail" class="glass rounded-xl p-6">
             <p class="text-sm text-slate-500">Cargando datos macro...</p>
         </div>
+
+        <!-- Economic Calendar -->
+        <div class="glass rounded-xl p-6 mt-6">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Calendario Economico</h3>
+            <div id="economic-calendar" class="space-y-2">
+                <p class="text-sm text-slate-500">Cargando...</p>
+            </div>
+        </div>
     </section>
 
     <!-- ORGANIZATION SECTION -->
     <section id="section-organization" class="hidden">
-        <h2 class="text-2xl font-bold text-white mb-6">Organización Agéntica</h2>
+        <h2 class="text-2xl font-bold text-white mb-6">Organizacion Agentica</h2>
         <div id="org-chart" class="space-y-6"></div>
+    </section>
+
+    <!-- PIPELINE SECTION -->
+    <section id="section-pipeline" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Pipeline de Decision</h2>
+
+        <!-- Pipeline Progress -->
+        <div id="pipeline-progress-container" class="glass rounded-xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-slate-300">Progreso del Pipeline</h3>
+                <span id="pipeline-status-badge" class="status-badge status-pending">Sin actividad</span>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="w-full bg-slate-700/50 rounded-full h-2 mb-6">
+                <div id="pipeline-progress-bar" class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <!-- Pipeline phases visualization -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="started">
+                    <div class="text-xs text-slate-400">1</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Inicio</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="analysis_running">
+                    <div class="text-xs text-slate-400">2</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Analisis</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="fiscal_running">
+                    <div class="text-xs text-slate-400">3</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Fiscal</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="committee_debate">
+                    <div class="text-xs text-slate-400">4</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Comite</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="veto_evaluation">
+                    <div class="text-xs text-slate-400">5</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Vetos</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="cio_synthesis">
+                    <div class="text-xs text-slate-400">6</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">CIO</div>
+                </div>
+                <div class="pipeline-phase border border-slate-700 rounded-lg p-3 text-center" data-phase="complete">
+                    <div class="text-xs text-slate-400">7</div>
+                    <div class="text-xs font-medium text-slate-300 mt-1">Completo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pipeline Event Log -->
+        <div class="glass rounded-xl p-6">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Log de Eventos del Pipeline</h3>
+            <div id="pipeline-event-log" class="space-y-2 max-h-96 overflow-y-auto">
+                <p class="text-sm text-slate-500">Sin eventos. Lanza un analisis para ver el pipeline en accion.</p>
+            </div>
+        </div>
     </section>
 
     <!-- DECISIONS SECTION -->
     <section id="section-decisions" class="hidden">
         <h2 class="text-2xl font-bold text-white mb-6">Historial de Decisiones</h2>
         <div id="decisions-list" class="space-y-4">
-            <p class="text-sm text-slate-500">Sin decisiones registradas aún.</p>
+            <p class="text-sm text-slate-500">Sin decisiones registradas aun.</p>
+        </div>
+    </section>
+
+    <!-- MEMORY SECTION -->
+    <section id="section-memory" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Memoria del Sistema</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Investment Criteria -->
+            <div class="glass rounded-xl p-6">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Criterios de Inversion</h3>
+                <div id="criteria-list" class="space-y-3">
+                    <p class="text-sm text-slate-500">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Principal Preferences -->
+            <div class="glass rounded-xl p-6">
+                <h3 class="text-sm font-semibold text-slate-300 mb-4">Preferencias del Principal</h3>
+                <div id="preferences-list" class="space-y-3">
+                    <p class="text-sm text-slate-500">Cargando...</p>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="glass rounded-xl p-6 lg:col-span-2">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-semibold text-slate-300">Alertas del Sistema</h3>
+                    <span id="alert-count" class="text-xs text-slate-400">0 alertas</span>
+                </div>
+                <div id="alerts-list" class="space-y-2">
+                    <p class="text-sm text-slate-500">Sin alertas.</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- NEW ANALYSIS SECTION -->
     <section id="section-analysis" class="hidden">
-        <h2 class="text-2xl font-bold text-white mb-6">Nuevo Análisis de Inversión</h2>
+        <h2 class="text-2xl font-bold text-white mb-6">Nuevo Analisis de Inversion</h2>
         <div class="glass rounded-xl p-6">
             <form id="analysis-form" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="text-xs text-slate-400 uppercase">Título</label>
-                        <input name="title" placeholder="Ej: Inversión en S&P 500 ETF" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                        <label class="text-xs text-slate-400 uppercase">Titulo</label>
+                        <input name="title" placeholder="Ej: Inversion en S&P 500 ETF" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none" required>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 uppercase">Clase de activo</label>
@@ -218,31 +370,65 @@
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 uppercase">Monto (USD)</label>
-                        <input name="amount_usd" type="number" step="any" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                        <input name="amount_usd" type="number" step="any" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none" required>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 uppercase">Retorno bruto esperado (%)</label>
-                        <input name="expected_gross_return_pct" type="number" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" required>
+                        <input name="expected_gross_return_pct" type="number" step="0.1" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none" required>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 uppercase">Horizonte (meses)</label>
-                        <input name="time_horizon_months" type="number" value="12" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1">
+                        <input name="time_horizon_months" type="number" value="12" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="text-xs text-slate-400 uppercase">Jurisdicción</label>
-                        <input name="jurisdiction" placeholder="Ej: Estados Unidos" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1">
+                        <label class="text-xs text-slate-400 uppercase">Jurisdiccion</label>
+                        <input name="jurisdiction" placeholder="Ej: Estados Unidos" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none">
                     </div>
                 </div>
                 <div>
-                    <label class="text-xs text-slate-400 uppercase">Descripción</label>
-                    <textarea name="description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1" placeholder="Describe la inversión..."></textarea>
+                    <label class="text-xs text-slate-400 uppercase">Descripcion</label>
+                    <textarea name="description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white mt-1 focus:border-blue-500 focus:outline-none" placeholder="Describe la inversion..."></textarea>
                 </div>
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition">
-                    Lanzar Análisis Completo
-                </button>
+                <div class="flex items-center gap-4">
+                    <button type="submit" id="analysis-submit-btn" class="bg-green-600 hover:bg-green-700 text-white rounded-lg px-6 py-2 text-sm font-medium transition">
+                        Lanzar Analisis Completo
+                    </button>
+                    <span id="analysis-spinner" class="hidden text-sm text-blue-400">Ejecutando pipeline...</span>
+                </div>
             </form>
             <div id="analysis-result" class="mt-6 hidden">
-                <pre class="bg-slate-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto whitespace-pre-wrap"></pre>
+                <h3 class="text-sm font-semibold text-slate-300 mb-2">Resultado del Pipeline</h3>
+                <pre class="bg-slate-900 rounded-lg p-4 text-xs text-green-300 overflow-x-auto whitespace-pre-wrap max-h-[600px] overflow-y-auto"></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUDIT SECTION -->
+    <section id="section-audit" class="hidden">
+        <h2 class="text-2xl font-bold text-white mb-6">Auditoria del Bus de Mensajes</h2>
+        <div class="glass rounded-xl p-6">
+            <div class="flex items-center gap-4 mb-4">
+                <button onclick="loadBusMessages()" class="bg-slate-700 hover:bg-slate-600 text-white rounded-lg px-4 py-2 text-sm transition">
+                    Actualizar Log
+                </button>
+                <select id="audit-filter-type" class="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+                    <option value="">Todos los tipos</option>
+                    <option value="analysis_report">Reportes de analisis</option>
+                    <option value="veto">Vetos</option>
+                    <option value="committee_decision">Decisiones de comite</option>
+                    <option value="alert">Alertas</option>
+                </select>
+            </div>
+            <div id="bus-messages" class="space-y-2 max-h-[600px] overflow-y-auto">
+                <p class="text-sm text-slate-500">Sin mensajes en el bus.</p>
+            </div>
+        </div>
+
+        <!-- Veto History -->
+        <div class="glass rounded-xl p-6 mt-6">
+            <h3 class="text-sm font-semibold text-slate-300 mb-4">Historial de Vetos</h3>
+            <div id="veto-history" class="space-y-2">
+                <p class="text-sm text-slate-500">Sin vetos registrados.</p>
             </div>
         </div>
     </section>
@@ -251,11 +437,103 @@
 
 <script>
 // ═══════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════
+let ws = null;
+let chartInstances = {};
+const pipelinePhaseOrder = ['started','analysis_running','fiscal_running','committee_debate','committee_complete','veto_evaluation','veto_complete','cio_synthesis','cio_complete','validation','complete'];
+
+// ═══════════════════════════════════════════════════════
+// WebSocket
+// ═══════════════════════════════════════════════════════
+function connectWebSocket() {
+    const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${protocol}//${location.host}/ws`);
+
+    ws.onopen = () => {
+        document.getElementById('ws-indicator').className = 'w-2 h-2 rounded-full bg-green-400 pulse-slow';
+        document.getElementById('ws-status').textContent = 'Conectado en vivo';
+    };
+
+    ws.onclose = () => {
+        document.getElementById('ws-indicator').className = 'w-2 h-2 rounded-full bg-red-400';
+        document.getElementById('ws-status').textContent = 'Desconectado';
+        setTimeout(connectWebSocket, 3000);
+    };
+
+    ws.onerror = () => {
+        document.getElementById('ws-indicator').className = 'w-2 h-2 rounded-full bg-amber-400';
+        document.getElementById('ws-status').textContent = 'Error de conexion';
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        handleWSMessage(data);
+    };
+
+    // Keep alive
+    setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({type: 'ping'}));
+        }
+    }, 30000);
+}
+
+function handleWSMessage(data) {
+    if (data.type === 'pipeline_progress') {
+        updatePipelineProgress(data);
+        addPipelineEvent(data);
+        showToast(`Pipeline: ${data.detail}`, data.phase === 'error' ? 'error' : 'info');
+    } else if (data.type === 'portfolio_update') {
+        loadOverview();
+        showToast('Portfolio actualizado', 'success');
+    } else if (data.type === 'new_alert') {
+        showToast(`Alerta: ${data.message}`, 'warning');
+        loadMemory();
+    } else if (data.type === 'criteria_update') {
+        showToast(`Criterio actualizado: ${data.key}`, 'info');
+        loadMemory();
+    }
+}
+
+// ═══════════════════════════════════════════════════════
 // Navigation
 // ═══════════════════════════════════════════════════════
 function showSection(name) {
     document.querySelectorAll('section[id^="section-"]').forEach(s => s.classList.add('hidden'));
-    document.getElementById('section-' + name).classList.remove('hidden');
+    const section = document.getElementById('section-' + name);
+    if (section) {
+        section.classList.remove('hidden');
+        section.classList.add('slide-in');
+    }
+
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('nav-active'));
+    const navLink = document.querySelector(`[data-nav="${name}"]`);
+    if (navLink) navLink.classList.add('nav-active');
+
+    // Lazy load sections
+    if (name === 'memory') loadMemory();
+    if (name === 'audit') { loadBusMessages(); loadVetoHistory(); }
+    if (name === 'markets') loadMarketCalendar();
+    if (name === 'pipeline') loadPipelineEvents();
+}
+
+// ═══════════════════════════════════════════════════════
+// Toast Notifications
+// ═══════════════════════════════════════════════════════
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const colors = {
+        info: 'border-blue-500 bg-blue-900/80',
+        success: 'border-green-500 bg-green-900/80',
+        warning: 'border-amber-500 bg-amber-900/80',
+        error: 'border-red-500 bg-red-900/80',
+    };
+    const toast = document.createElement('div');
+    toast.className = `glass border-l-4 ${colors[type] || colors.info} rounded-lg p-3 text-sm text-white slide-in`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 4000);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -264,6 +542,7 @@ function showSection(name) {
 async function fetchJSON(url) {
     try {
         const r = await fetch(url);
+        if (!r.ok) return null;
         return await r.json();
     } catch (e) {
         console.error('Fetch error:', url, e);
@@ -275,6 +554,14 @@ async function fetchJSON(url) {
 // Load Overview
 // ═══════════════════════════════════════════════════════
 async function loadOverview() {
+    // Health
+    const health = await fetchJSON('/api/health');
+    if (health) {
+        const badge = document.getElementById('health-badge');
+        badge.textContent = health.status === 'operational' ? 'Operativo' : 'Error';
+        badge.className = `status-badge ${health.status === 'operational' ? 'status-active' : 'status-veto'}`;
+    }
+
     // Portfolio
     const portfolio = await fetchJSON('/api/portfolio');
     if (portfolio) {
@@ -290,6 +577,11 @@ async function loadOverview() {
         }
         if (portfolio.allocation_by_jurisdiction && Object.keys(portfolio.allocation_by_jurisdiction).length) {
             renderPieChart('chart-allocation-jurisdiction', portfolio.allocation_by_jurisdiction);
+        }
+
+        // Portfolio section details
+        if (portfolio.assets) {
+            renderPortfolioTable(portfolio);
         }
     }
 
@@ -324,7 +616,8 @@ const chartColors = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#ec4899'
 function renderPieChart(canvasId, data) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
-    new Chart(ctx, {
+    if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+    chartInstances[canvasId] = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(data),
@@ -344,6 +637,50 @@ function renderPieChart(canvasId, data) {
 }
 
 // ═══════════════════════════════════════════════════════
+// Portfolio Table
+// ═══════════════════════════════════════════════════════
+function renderPortfolioTable(portfolio) {
+    const tbody = document.getElementById('portfolio-table');
+    const assets = portfolio.assets || [];
+    const total = portfolio.total_value_usd || 1;
+
+    document.getElementById('port-total-value').textContent =
+        total > 0 ? `USD ${total.toLocaleString('en-US', {minimumFractionDigits: 0})}` : '--';
+
+    let totalCost = 0;
+    assets.forEach(a => totalCost += (a.cost_basis_usd || 0));
+    const unrealizedPnl = total - totalCost;
+    const pnlEl = document.getElementById('port-unrealized-pnl');
+    pnlEl.textContent = `USD ${unrealizedPnl >= 0 ? '+' : ''}${unrealizedPnl.toLocaleString('en-US', {minimumFractionDigits: 0})}`;
+    pnlEl.className = `text-xl font-bold mt-1 ${unrealizedPnl >= 0 ? 'text-green-400' : 'text-red-400'}`;
+    document.getElementById('port-position-count').textContent = assets.length;
+
+    if (!assets.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-4 text-center text-slate-500">Portfolio vacio</td></tr>';
+        return;
+    }
+
+    let html = '';
+    assets.forEach(a => {
+        const pnl = (a.current_value_usd || 0) - (a.cost_basis_usd || 0);
+        const pnlPct = a.cost_basis_usd > 0 ? (pnl / a.cost_basis_usd * 100) : 0;
+        const pctPortfolio = total > 0 ? (a.current_value_usd / total * 100) : 0;
+        const pnlColor = pnl >= 0 ? 'text-green-400' : 'text-red-400';
+        html += `<tr class="border-b border-slate-800 hover:bg-slate-800/30">
+            <td class="py-3 px-4 text-white font-medium">${a.name}${a.ticker ? ' <span class="text-slate-500 text-xs">('+a.ticker+')</span>' : ''}</td>
+            <td class="py-3 px-4 text-slate-300">${a.asset_class}</td>
+            <td class="py-3 px-4 text-slate-300">${a.jurisdiction}</td>
+            <td class="py-3 px-4 text-right text-slate-300">${a.quantity.toLocaleString()}</td>
+            <td class="py-3 px-4 text-right text-slate-300">${(a.cost_basis_usd||0).toLocaleString('en-US', {minimumFractionDigits: 0})}</td>
+            <td class="py-3 px-4 text-right text-white font-medium">${(a.current_value_usd||0).toLocaleString('en-US', {minimumFractionDigits: 0})}</td>
+            <td class="py-3 px-4 text-right ${pnlColor}">${pnl >= 0 ? '+' : ''}${pnl.toLocaleString('en-US', {minimumFractionDigits: 0})} (${pnlPct.toFixed(1)}%)</td>
+            <td class="py-3 px-4 text-right text-slate-300">${pctPortfolio.toFixed(1)}%</td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
 // Market Grid
 // ═══════════════════════════════════════════════════════
 function renderMarketGrid(markets) {
@@ -351,19 +688,19 @@ function renderMarketGrid(markets) {
     grid.innerHTML = '';
     const names = {
         sp500: 'S&P 500', nasdaq: 'Nasdaq', euro_stoxx50: 'Euro Stoxx 50',
-        ibex35: 'IBEX 35', vix: 'VIX', gold: 'Oro', wti_oil: 'Petróleo WTI',
+        ibex35: 'IBEX 35', vix: 'VIX', gold: 'Oro', wti_oil: 'Petroleo WTI',
         btc_usd: 'Bitcoin', eur_usd: 'EUR/USD'
     };
     for (const [key, val] of Object.entries(markets)) {
         if (!val.price) continue;
         const change = val.change_pct || 0;
         const color = change >= 0 ? 'text-green-400' : 'text-red-400';
-        const arrow = change >= 0 ? '▲' : '▼';
+        const arrow = change >= 0 ? '+' : '';
         grid.innerHTML += `
-            <div class="glass rounded-lg p-3">
+            <div class="glass rounded-lg p-3 glass-hover cursor-pointer" onclick="alert('Ticker: ${key}')">
                 <p class="text-xs text-slate-400">${names[key] || key}</p>
-                <p class="text-sm font-semibold text-white">${parseFloat(val.price).toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
-                <p class="text-xs ${color}">${arrow} ${Math.abs(change).toFixed(2)}%</p>
+                <p class="text-sm font-semibold text-white mt-1">${parseFloat(val.price).toLocaleString('en-US', {maximumFractionDigits: 2})}</p>
+                <p class="text-xs ${color}">${arrow}${change.toFixed(2)}%</p>
             </div>`;
     }
 }
@@ -399,6 +736,27 @@ function renderMarketsDetail(macro) {
 }
 
 // ═══════════════════════════════════════════════════════
+// Economic Calendar
+// ═══════════════════════════════════════════════════════
+async function loadMarketCalendar() {
+    const events = await fetchJSON('/api/market/calendar');
+    const el = document.getElementById('economic-calendar');
+    if (!events || !events.length) { el.innerHTML = '<p class="text-sm text-slate-500">Sin eventos.</p>'; return; }
+    let html = '';
+    events.forEach(e => {
+        const impactColor = e.impact === 'high' ? 'text-red-400' : 'text-amber-400';
+        html += `<div class="flex items-center justify-between glass rounded-lg p-3">
+            <span class="text-sm text-white">${e.event}</span>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-400">${e.frequency}</span>
+                <span class="text-xs font-medium ${impactColor} uppercase">${e.impact}</span>
+            </div>
+        </div>`;
+    });
+    el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════
 // Organization Chart
 // ═══════════════════════════════════════════════════════
 function renderOrgChart(agents) {
@@ -410,7 +768,7 @@ function renderOrgChart(agents) {
     });
 
     const layerNames = {
-        direction: 'Dirección', analysis: 'Análisis',
+        direction: 'Direccion', analysis: 'Analisis',
         fiscal: 'Fiscalidad & Legal', risk: 'Riesgo & Control',
         operations: 'Operaciones'
     };
@@ -427,9 +785,10 @@ function renderOrgChart(agents) {
         html += '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">';
         list.forEach(a => {
             const vetoBadge = a.has_veto ? '<span class="status-badge status-veto ml-2">VETO</span>' : '';
-            html += `<div class="bg-slate-800/50 rounded-lg p-3">
+            html += `<div class="bg-slate-800/50 rounded-lg p-3 cursor-pointer glass-hover" onclick="showAgentDetail('${a.role}')">
                 <p class="text-sm font-medium text-white">${a.name}${vetoBadge}</p>
                 <p class="text-xs text-slate-400 mt-1">${a.specialty}</p>
+                <p class="text-xs text-slate-500 mt-1">${a.primary_objective ? a.primary_objective.substring(0, 80) + '...' : ''}</p>
             </div>`;
         });
         html += '</div></div>';
@@ -437,24 +796,254 @@ function renderOrgChart(agents) {
     el.innerHTML = html;
 }
 
+async function showAgentDetail(role) {
+    const agent = await fetchJSON(`/api/organization/agent/${role}`);
+    if (!agent) return;
+
+    let html = `<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onclick="this.remove()">
+        <div class="glass rounded-xl p-6 max-w-lg w-full mx-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-white">${agent.name}</h3>
+                ${agent.can_veto.length ? '<span class="status-badge status-veto">VETO</span>' : ''}
+            </div>
+            <div class="space-y-3 text-sm">
+                <div><span class="text-slate-400">Rol:</span> <span class="text-white">${agent.role}</span></div>
+                <div><span class="text-slate-400">Capa:</span> <span class="text-white">${agent.layer}</span></div>
+                <div><span class="text-slate-400">Especialidad:</span> <span class="text-white">${agent.specialty}</span></div>
+                <div><span class="text-slate-400">Objetivo:</span> <span class="text-white">${agent.primary_objective}</span></div>
+                ${agent.can_recommend.length ? `<div><span class="text-slate-400">Puede recomendar:</span><ul class="mt-1 ml-4 text-slate-300">${agent.can_recommend.map(r => `<li class="text-xs">- ${r}</li>`).join('')}</ul></div>` : ''}
+                ${agent.can_veto.length ? `<div><span class="text-slate-400">Puede vetar:</span><ul class="mt-1 ml-4 text-red-300">${agent.can_veto.map(v => `<li class="text-xs">- ${v}</li>`).join('')}</ul></div>` : ''}
+                ${agent.restrictions.length ? `<div><span class="text-slate-400">Restricciones:</span><ul class="mt-1 ml-4 text-amber-300">${agent.restrictions.map(r => `<li class="text-xs">- ${r}</li>`).join('')}</ul></div>` : ''}
+                <div><span class="text-slate-400">Reporta a:</span> <span class="text-white">${agent.reports_to.join(', ') || 'N/A'}</span></div>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg px-4 py-2 text-sm">Cerrar</button>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// ═══════════════════════════════════════════════════════
+// Pipeline Progress
+// ═══════════════════════════════════════════════════════
+function updatePipelineProgress(event) {
+    // Update progress bar
+    const bar = document.getElementById('pipeline-progress-bar');
+    bar.style.width = event.progress_pct + '%';
+
+    // Update status badge
+    const badge = document.getElementById('pipeline-status-badge');
+    if (event.phase === 'complete') {
+        badge.textContent = 'Completado';
+        badge.className = 'status-badge status-active';
+        bar.className = 'progress-bar bg-green-500 h-2 rounded-full';
+    } else if (event.phase === 'error') {
+        badge.textContent = 'Error';
+        badge.className = 'status-badge status-veto';
+        bar.className = 'progress-bar bg-red-500 h-2 rounded-full';
+    } else {
+        badge.textContent = 'En progreso';
+        badge.className = 'status-badge status-analyzing';
+        bar.className = 'progress-bar bg-blue-500 h-2 rounded-full';
+    }
+
+    // Update phase indicators
+    const currentPhaseIndex = pipelinePhaseOrder.indexOf(event.phase);
+    document.querySelectorAll('.pipeline-phase').forEach(el => {
+        const phase = el.dataset.phase;
+        const phaseIndex = pipelinePhaseOrder.indexOf(phase);
+        el.classList.remove('active', 'done', 'error');
+        if (event.phase === 'error') {
+            el.classList.add('error');
+        } else if (phaseIndex < currentPhaseIndex) {
+            el.classList.add('done');
+        } else if (phaseIndex === currentPhaseIndex || phase === event.phase) {
+            el.classList.add('active');
+        }
+    });
+}
+
+function addPipelineEvent(event) {
+    const el = document.getElementById('pipeline-event-log');
+    if (el.querySelector('.text-slate-500')) el.innerHTML = '';
+
+    const phaseColor = event.phase === 'error' ? 'text-red-400' : event.phase === 'complete' ? 'text-green-400' : 'text-blue-400';
+    const time = new Date(event.timestamp).toLocaleTimeString();
+    const html = `<div class="flex items-start gap-3 glass rounded-lg p-3 slide-in">
+        <span class="text-xs text-slate-500 whitespace-nowrap mt-0.5">${time}</span>
+        <span class="text-xs font-medium ${phaseColor} uppercase whitespace-nowrap mt-0.5">${event.phase}</span>
+        <span class="text-xs text-slate-300">${event.detail}</span>
+        <span class="text-xs text-slate-500 ml-auto">${event.progress_pct}%</span>
+    </div>`;
+    el.insertAdjacentHTML('afterbegin', html);
+}
+
+async function loadPipelineEvents() {
+    const events = await fetchJSON('/api/pipeline/events');
+    if (events && events.length) {
+        const el = document.getElementById('pipeline-event-log');
+        el.innerHTML = '';
+        events.reverse().forEach(e => addPipelineEvent(e));
+        updatePipelineProgress(events[0]);
+    }
+}
+
 // ═══════════════════════════════════════════════════════
 // Decisions
 // ═══════════════════════════════════════════════════════
 function renderDecisions(decisions) {
     const el = document.getElementById('decisions-list');
-    if (!decisions.length) return;
+    if (!decisions.length) { el.innerHTML = '<p class="text-sm text-slate-500">Sin decisiones registradas.</p>'; return; }
 
     let html = '';
     decisions.forEach(d => {
-        const statusClass = d.status === 'approved' ? 'status-active' :
-            d.status === 'vetoed' ? 'status-veto' : 'status-pending';
-        html += `<div class="glass rounded-xl p-4">
+        const statusMap = {
+            approved: 'status-active', vetoed: 'status-veto',
+            awaiting_user: 'status-pending', pending: 'status-pending',
+            analyzing: 'status-analyzing', executed: 'status-active',
+        };
+        const statusClass = statusMap[d.status] || 'status-pending';
+        html += `<div class="glass rounded-xl p-4 glass-hover cursor-pointer" onclick="showDecisionDetail('${d.id}')">
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-sm font-medium text-white">${d.title}</p>
-                    <p class="text-xs text-slate-400 mt-1">USD ${(d.amount_usd || 0).toLocaleString()}</p>
+                    <p class="text-xs text-slate-400 mt-1">USD ${(d.amount_usd || 0).toLocaleString()} | ${new Date(d.timestamp).toLocaleDateString()}</p>
                 </div>
                 <span class="status-badge ${statusClass}">${d.status}</span>
+            </div>
+        </div>`;
+    });
+    el.innerHTML = html;
+}
+
+async function showDecisionDetail(id) {
+    const decision = await fetchJSON(`/api/decisions/${id}`);
+    if (!decision) return;
+
+    let html = `<div class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onclick="this.remove()">
+        <div class="glass rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+            <h3 class="text-lg font-bold text-white mb-4">${decision.title}</h3>
+            <pre class="bg-slate-900 rounded-lg p-4 text-xs text-green-300 whitespace-pre-wrap">${JSON.stringify(decision, null, 2)}</pre>
+            <button onclick="this.parentElement.parentElement.remove()" class="mt-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg px-4 py-2 text-sm">Cerrar</button>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
+// ═══════════════════════════════════════════════════════
+// Memory
+// ═══════════════════════════════════════════════════════
+async function loadMemory() {
+    // Criteria
+    const criteria = await fetchJSON('/api/criteria');
+    if (criteria) {
+        const el = document.getElementById('criteria-list');
+        let html = '';
+        const skipKeys = ['change_log'];
+        for (const [key, value] of Object.entries(criteria)) {
+            if (skipKeys.includes(key)) continue;
+            html += `<div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                <span class="text-slate-400">${key}</span>
+                <span class="text-white font-medium">${Array.isArray(value) ? value.join(', ') : String(value)}</span>
+            </div>`;
+        }
+        if (criteria.change_log && criteria.change_log.length) {
+            html += '<div class="mt-3"><p class="text-xs text-slate-500 mb-2">Cambios recientes:</p>';
+            criteria.change_log.slice(-3).reverse().forEach(c => {
+                html += `<div class="text-xs text-slate-400 mb-1">${c.key}: ${c.old_value} -> ${c.new_value} (${c.reason})</div>`;
+            });
+            html += '</div>';
+        }
+        el.innerHTML = html || '<p class="text-sm text-slate-500">Sin criterios.</p>';
+    }
+
+    // Preferences
+    const prefs = await fetchJSON('/api/preferences');
+    if (prefs) {
+        const el = document.getElementById('preferences-list');
+        let html = '';
+        for (const [key, value] of Object.entries(prefs)) {
+            const display = typeof value === 'object' ? JSON.stringify(value) : String(value);
+            html += `<div class="flex justify-between items-center text-sm border-b border-slate-800 pb-2">
+                <span class="text-slate-400">${key}</span>
+                <span class="text-white font-medium text-right max-w-[200px] truncate">${display}</span>
+            </div>`;
+        }
+        el.innerHTML = html || '<p class="text-sm text-slate-500">Sin preferencias.</p>';
+    }
+
+    // Alerts
+    const alerts = await fetchJSON('/api/alerts');
+    if (alerts) {
+        const el = document.getElementById('alerts-list');
+        document.getElementById('alert-count').textContent = `${alerts.filter(a => !a.resolved).length} activas`;
+        if (!alerts.length) { el.innerHTML = '<p class="text-sm text-slate-500">Sin alertas.</p>'; return; }
+        let html = '';
+        alerts.forEach((a, i) => {
+            const resolved = a.resolved ? 'opacity-50' : '';
+            const typeColor = a.type === 'error' ? 'text-red-400' : a.type === 'warning' ? 'text-amber-400' : 'text-blue-400';
+            html += `<div class="flex items-center justify-between glass rounded-lg p-3 ${resolved}">
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-medium ${typeColor} uppercase">${a.type}</span>
+                    <span class="text-sm text-white">${a.message}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500">${a.source}</span>
+                    ${!a.resolved ? `<button onclick="resolveAlert(${i})" class="text-xs text-green-400 hover:text-green-300">Resolver</button>` : '<span class="text-xs text-slate-600">Resuelto</span>'}
+                </div>
+            </div>`;
+        });
+        el.innerHTML = html;
+    }
+}
+
+async function resolveAlert(index) {
+    await fetch(`/api/alerts/${index}/resolve`, { method: 'PUT' });
+    loadMemory();
+    showToast('Alerta resuelta', 'success');
+}
+
+// ═══════════════════════════════════════════════════════
+// Audit
+// ═══════════════════════════════════════════════════════
+async function loadBusMessages() {
+    const filter = document.getElementById('audit-filter-type').value;
+    const url = filter ? `/api/bus/messages?msg_type=${filter}` : '/api/bus/messages';
+    const messages = await fetchJSON(url);
+    const el = document.getElementById('bus-messages');
+    if (!messages || !messages.length) { el.innerHTML = '<p class="text-sm text-slate-500">Sin mensajes.</p>'; return; }
+    let html = '';
+    messages.reverse().forEach(m => {
+        const typeColors = {
+            analysis_report: 'text-green-400', veto: 'text-red-400',
+            committee_decision: 'text-blue-400', alert: 'text-amber-400',
+        };
+        const color = typeColors[m.type] || 'text-slate-400';
+        html += `<div class="flex items-center gap-3 glass rounded-lg p-3 text-xs">
+            <span class="text-slate-500 whitespace-nowrap">${new Date(m.timestamp).toLocaleTimeString()}</span>
+            <span class="font-medium ${color} uppercase whitespace-nowrap">${m.type}</span>
+            <span class="text-white">${m.sender}</span>
+            <span class="text-slate-500">${m.recipient ? '-> ' + m.recipient : '(broadcast)'}</span>
+            <span class="text-slate-600 ml-auto">[${m.payload_keys.join(', ')}]</span>
+        </div>`;
+    });
+    el.innerHTML = html;
+}
+
+async function loadVetoHistory() {
+    const vetoes = await fetchJSON('/api/pipeline/veto-history');
+    const el = document.getElementById('veto-history');
+    if (!vetoes || !vetoes.length) { el.innerHTML = '<p class="text-sm text-slate-500">Sin vetos.</p>'; return; }
+    let html = '';
+    vetoes.forEach(v => {
+        html += `<div class="glass rounded-lg p-4 border-l-4 border-red-500">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-white">${v.agent_role}</span>
+                <span class="status-badge status-veto">${v.veto_type}</span>
+            </div>
+            <p class="text-xs text-slate-300">${v.justification}</p>
+            <div class="flex items-center gap-4 mt-2">
+                <span class="text-xs text-slate-500">Severidad: ${(v.severity * 100).toFixed(0)}%</span>
+                <span class="text-xs text-slate-500">${new Date(v.timestamp).toLocaleString()}</span>
             </div>
         </div>`;
     });
@@ -476,7 +1065,13 @@ document.getElementById('add-asset-form').addEventListener('submit', async (e) =
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     });
-    if (r.ok) { e.target.reset(); loadOverview(); }
+    if (r.ok) {
+        e.target.reset();
+        loadOverview();
+        showToast('Activo agregado al portfolio', 'success');
+    } else {
+        showToast('Error al agregar activo', 'error');
+    }
 });
 
 document.getElementById('analysis-form').addEventListener('submit', async (e) => {
@@ -488,27 +1083,49 @@ document.getElementById('analysis-form').addEventListener('submit', async (e) =>
     data.time_horizon_months = parseInt(data.time_horizon_months);
 
     const resultEl = document.getElementById('analysis-result');
-    resultEl.classList.remove('hidden');
-    resultEl.querySelector('pre').textContent = 'Ejecutando análisis completo... Los agentes están trabajando.';
+    const submitBtn = document.getElementById('analysis-submit-btn');
+    const spinner = document.getElementById('analysis-spinner');
+
+    resultEl.classList.add('hidden');
+    submitBtn.disabled = true;
+    submitBtn.classList.add('opacity-50');
+    spinner.classList.remove('hidden');
+
+    // Switch to pipeline view to see progress
+    showSection('pipeline');
 
     const r = await fetch('/api/analyze', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
     });
 
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('opacity-50');
+    spinner.classList.add('hidden');
+
+    // Switch back to show result
+    showSection('analysis');
+
     if (r.ok) {
         const result = await r.json();
+        resultEl.classList.remove('hidden');
         resultEl.querySelector('pre').textContent = result.report || JSON.stringify(result, null, 2);
+        showToast('Analisis completado', 'success');
+        loadOverview();
     } else {
+        resultEl.classList.remove('hidden');
         resultEl.querySelector('pre').textContent = 'Error: ' + (await r.text());
+        showToast('Error en el analisis', 'error');
     }
 });
 
 // ═══════════════════════════════════════════════════════
 // Init
 // ═══════════════════════════════════════════════════════
+showSection('overview');
+connectWebSocket();
 loadOverview();
-setInterval(loadOverview, 60000); // Refresh every 60s
+setInterval(loadOverview, 60000);
 </script>
 
 </body>

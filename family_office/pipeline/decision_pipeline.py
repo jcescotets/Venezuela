@@ -23,6 +23,7 @@ from family_office.core.models import (
 )
 from family_office.core.registry import AgentRegistry
 from family_office.pipeline.debate_engine import DebateEngine
+from family_office.pipeline.pipeline_events import PipelinePhase, pipeline_events
 from family_office.pipeline.veto_gate import VetoGate
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ class DecisionPipeline:
         self.registry = registry
         self.debate_engine = DebateEngine(registry)
         self.veto_gate = VetoGate(registry)
+        self.events = pipeline_events
         self._pipeline_log: list[dict[str, Any]] = []
 
     async def process_proposal(
@@ -73,10 +75,23 @@ class DecisionPipeline:
         self._log_phase(proposal.id, "START", "Pipeline initiated")
         proposal.status = DecisionStatus.ANALYZING
 
+        await self.events.emit(
+            proposal.id, PipelinePhase.STARTED,
+            f"Pipeline iniciado para: {proposal.title}",
+            progress_pct=0,
+            data={"title": proposal.title, "amount_usd": proposal.amount_usd},
+        )
+
         # ═══════════════════════════════════════════════════════
         # FASE 1 & 2: Análisis independiente + Fiscal (paralelo)
         # ═══════════════════════════════════════════════════════
         try:
+            await self.events.emit(
+                proposal.id, PipelinePhase.ANALYSIS_RUNNING,
+                "Agentes de análisis y fiscal trabajando en paralelo...",
+                progress_pct=10,
+            )
+
             analysis_reports, fiscal_reports, committee_decision = (
                 await self.debate_engine.full_debate(proposal, context)
             )
@@ -92,6 +107,16 @@ class DecisionPipeline:
             }
             result["committee_decision"] = committee_decision
 
+            await self.events.emit(
+                proposal.id, PipelinePhase.COMMITTEE_COMPLETE,
+                f"{len(analysis_reports)} análisis + {len(fiscal_reports)} fiscales. Comité finalizado.",
+                progress_pct=50,
+                data={
+                    "analysis_count": len(analysis_reports),
+                    "fiscal_count": len(fiscal_reports),
+                },
+            )
+
             self._log_phase(
                 proposal.id, "ANALYSIS_COMPLETE",
                 f"{len(analysis_reports)} analysis + {len(fiscal_reports)} fiscal reports"
@@ -100,12 +125,23 @@ class DecisionPipeline:
             logger.error(f"Analysis phase failed: {e}")
             result["status"] = DecisionStatus.REJECTED
             result["error"] = str(e)
+            await self.events.emit(
+                proposal.id, PipelinePhase.ERROR,
+                f"Error en fase de análisis: {e}", progress_pct=0,
+            )
             return result
 
         # ═══════════════════════════════════════════════════════
         # FASE 3: Evaluación de vetos (Risk Manager + Head Tax)
         # ═══════════════════════════════════════════════════════
+        veto_check = {}
         try:
+            await self.events.emit(
+                proposal.id, PipelinePhase.VETO_EVALUATION,
+                "Risk Manager y Head of Tax evaluando vetos...",
+                progress_pct=60,
+            )
+
             # Risk veto
             risk_vetoes = await self.veto_gate.evaluate_risk_veto(proposal, portfolio)
             proposal.vetoes.extend(risk_vetoes)
@@ -120,6 +156,14 @@ class DecisionPipeline:
             result["vetoes"] = proposal.vetoes
             veto_check = self.veto_gate.check_vetoes(proposal)
             result["veto_check"] = veto_check
+
+            await self.events.emit(
+                proposal.id, PipelinePhase.VETO_COMPLETE,
+                f"Vetos: {len(risk_vetoes)} riesgo, {len(tax_vetoes)} fiscal. "
+                f"{'BLOQUEADO' if veto_check['blocked'] else 'Sin bloqueos'}",
+                progress_pct=70,
+                data={"blocked": veto_check["blocked"]},
+            )
 
             self._log_phase(
                 proposal.id, "VETO_CHECK",
@@ -140,10 +184,21 @@ class DecisionPipeline:
         # FASE 4: Síntesis del CIO
         # ═══════════════════════════════════════════════════════
         try:
+            await self.events.emit(
+                proposal.id, PipelinePhase.CIO_SYNTHESIS,
+                "Chief Investment Officer sintetizando recomendación final...",
+                progress_pct=80,
+            )
+
             cio = self.registry.get(AgentRole.CIO)
             if cio:
                 cio_decision = await cio.synthesize_proposal(proposal)
                 result["cio_synthesis"] = cio_decision
+
+                await self.events.emit(
+                    proposal.id, PipelinePhase.CIO_COMPLETE,
+                    "Síntesis del CIO completada.", progress_pct=90,
+                )
                 self._log_phase(proposal.id, "CIO_SYNTHESIS", "Complete")
         except Exception as e:
             logger.error(f"CIO synthesis failed: {e}")
@@ -152,6 +207,11 @@ class DecisionPipeline:
         # ═══════════════════════════════════════════════════════
         # FASE 5: Validación de completitud (Instrucción 5)
         # ═══════════════════════════════════════════════════════
+        await self.events.emit(
+            proposal.id, PipelinePhase.VALIDATION,
+            "Validando requisitos de la Instrucción 5...", progress_pct=95,
+        )
+
         validation = self._validate_decision(result)
         result["validation"] = validation
 
@@ -165,6 +225,17 @@ class DecisionPipeline:
 
         proposal.updated_at = datetime.now(timezone.utc)
         self._log_phase(proposal.id, "PIPELINE_COMPLETE", f"Status: {result['status']}")
+
+        await self.events.emit(
+            proposal.id, PipelinePhase.COMPLETE,
+            f"Pipeline completado. Estado: {result['status'].value}",
+            progress_pct=100,
+            data={
+                "status": result["status"].value,
+                "ready_for_principal": result["ready_for_principal"],
+                "validation": validation,
+            },
+        )
 
         return result
 

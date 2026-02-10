@@ -28,9 +28,18 @@ aiosqlite==0.20.0
 # Dashboard
 jinja2==3.1.5
 python-multipart==0.0.20
+websockets==14.1
+
+# Reports
+reportlab==4.2.5
 
 # Scheduling
 apscheduler==3.10.4
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1
 
 # Utilities
 rich==13.9.4
