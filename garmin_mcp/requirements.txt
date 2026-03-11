@@ -1,0 +1,4 @@
+garth>=0.6.0
+fitparse>=0.6.0
+pydantic>=2.0.0
+mcp[cli]>=1.0.0
