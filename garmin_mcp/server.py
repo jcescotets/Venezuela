@@ -150,6 +150,7 @@ async def garmin_list_activities(params: ListActivitiesInput) -> str:
         resp = client.get(
             GARMIN_CONNECT_API,
             "/activitylist-service/activities/search/activities",
+            api=True,
             params={"limit": params.limit, "start": params.start}
         )
         activities = resp.json()
@@ -211,13 +212,15 @@ async def garmin_get_activity_detail(params: ActivityIdInput) -> str:
         # Main activity details
         detail = client.get(
             GARMIN_CONNECT_API,
-            f"/activity-service/activity/{aid}"
+            f"/activity-service/activity/{aid}",
+            api=True,
         ).json()
         # HR zones
         try:
             hr_zones = client.get(
                 GARMIN_CONNECT_API,
-                f"/activity-service/activity/{aid}/hrTimeInZones"
+                f"/activity-service/activity/{aid}/hrTimeInZones",
+                api=True,
             ).json()
         except Exception:
             hr_zones = None
@@ -225,7 +228,8 @@ async def garmin_get_activity_detail(params: ActivityIdInput) -> str:
         try:
             splits = client.get(
                 GARMIN_CONNECT_API,
-                f"/activity-service/activity/{aid}/splits"
+                f"/activity-service/activity/{aid}/splits",
+                api=True,
             ).json()
         except Exception:
             splits = None
@@ -312,7 +316,8 @@ async def garmin_parse_fit_file(params: ParseFitInput) -> str:
         # Download the FIT file
         response = client.get(
             GARMIN_CONNECT_API,
-            f"/download-service/files/activity/{aid}"
+            f"/download-service/files/activity/{aid}",
+            api=True,
         )
         # Garmin returns a zip with the .fit inside
         import zipfile
@@ -420,6 +425,7 @@ async def garmin_get_training_load(params: TrainingLoadInput) -> str:
         resp = client.get(
             GARMIN_CONNECT_API,
             "/activitylist-service/activities/search/activities",
+            api=True,
             params={"limit": limit, "start": 0}
         )
         activities = resp.json()
@@ -535,6 +541,7 @@ async def garmin_get_wellness(params: ActivityIdInput) -> str:
             sleep = client.get(
                 GARMIN_CONNECT_API,
                 "/wellness-service/wellness/dailySleepData",
+                api=True,
                 params={"date": target_date}
             ).json()
             sd = sleep.get("dailySleepDTO", {})
@@ -554,7 +561,8 @@ async def garmin_get_wellness(params: ActivityIdInput) -> str:
         try:
             hrv = client.get(
                 GARMIN_CONNECT_API,
-                f"/hrv-service/hrv/{target_date}"
+                f"/hrv-service/hrv/{target_date}",
+                api=True,
             ).json()
             wellness["hrv"] = {
                 "last_night": hrv.get("lastNight"),
@@ -569,7 +577,8 @@ async def garmin_get_wellness(params: ActivityIdInput) -> str:
         try:
             stress = client.get(
                 GARMIN_CONNECT_API,
-                f"/wellness-service/wellness/dailyStress/{target_date}"
+                f"/wellness-service/wellness/dailyStress/{target_date}",
+                api=True,
             ).json()
             wellness["stress"] = {
                 "avg_stress": stress.get("avgStressLevel"),
@@ -586,6 +595,7 @@ async def garmin_get_wellness(params: ActivityIdInput) -> str:
             daily = client.get(
                 GARMIN_CONNECT_API,
                 f"/usersummary-service/usersummary/daily/{target_date}",
+                api=True,
                 params={"calendarDate": target_date}
             ).json()
             wellness["daily_summary"] = {
