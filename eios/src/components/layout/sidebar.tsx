@@ -16,7 +16,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { NavItem } from "./nav-item";
-import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 const modules = [
   { href: "/portfolio", label: "Portfolio", icon: Briefcase },
@@ -33,7 +33,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   async function handleLogout() {
-    const supabase = createBrowserSupabaseClient();
+    const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = "/login";
   }
