@@ -1,0 +1,47 @@
+# Family Office Agentic System - Dependencies
+
+# Core Framework
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-dotenv==1.0.1
+
+# AI / LLM
+anthropic==0.42.0
+openai==1.58.1
+
+# Data & Market APIs
+yfinance==0.2.51
+fredapi==0.5.2
+alpha-vantage==3.0.0
+requests==2.32.3
+httpx==0.28.1
+
+# Data Processing
+pandas==2.2.3
+numpy==2.2.1
+
+# Persistence
+sqlalchemy==2.0.36
+aiosqlite==0.20.0
+
+# Dashboard
+jinja2==3.1.5
+python-multipart==0.0.20
+websockets==14.1
+
+# Reports
+reportlab==4.2.5
+
+# Scheduling
+apscheduler==3.10.4
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1
+
+# Utilities
+rich==13.9.4
+pyyaml==6.0.2
+uuid6==2024.7.10

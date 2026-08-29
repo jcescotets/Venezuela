@@ -3,518 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO y Redes Sociales: Esto hace que se vea bien al compartir el link -->
-    <title>Venezuela: El Último Nodo | Serie Documental</title>
-    <meta name="description" content="Infografía interactiva sobre la serie conceptual: Energía, poder y el rediseño del hemisferio occidental.">
-    <meta property="og:title" content="Venezuela: El Último Nodo - Infografía">
-    <meta property="og:description" content="No fue ideología, fueron recursos. Explora la narrativa geopolítica de las 7 temporadas.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1516937941348-c09645f31e88?q=80&w=2070&auto=format&fit=crop">
+
+    <title>Family Office — Sistema Agentico de Inversión</title>
+    <meta name="description" content="Sistema multi-agente de IA con 20 agentes especializados para operaciones de inversión, preservación de patrimonio y control de riesgo.">
+    <meta property="og:title" content="Family Office — Sistema Agentico">
+    <meta property="og:description" content="20 agentes de IA organizados en 5 capas para decisiones de inversión con debate estructurado y poder de veto.">
     <meta property="og:type" content="website">
-    
-    <!-- Favicon (Icono de la pestaña) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛢️</text></svg>">
 
-    <!-- Tailwind CSS (Estilos) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬡</text></svg>">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Chart.js (Gráficos) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Google Fonts (Tipografía Cinemática) -->
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-
-    <!-- Paleta de Colores: Deep Midnight (#0f172a), Neon Gold (#fbbf24), Electric Cyan (#22d3ee), Signal Red (#ef4444) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* Estilos base */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #0f172a; /* Slate 900 */
-            color: #e2e8f0; /* Slate 200 */
-            scroll-behavior: smooth;
-        }
-        h1, h2, h3, .cinematic-title {
-            font-family: 'Oswald', sans-serif;
-            text-transform: uppercase;
-        }
-        
-        /* Contenedor de gráficos responsivo */
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            height: 350px; /* Altura base móvil */
-            margin: 0 auto;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px; /* Altura escritorio */
-            }
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #0a0f1c; color: #e2e8f0; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #22d3ee, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* Efectos visuales de tarjetas */
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(100, 116, 139, 0.15);
+        }
+
+        .glow-blue { box-shadow: 0 0 40px rgba(59, 130, 246, 0.12); }
+        .glow-green { box-shadow: 0 0 40px rgba(34, 197, 94, 0.12); }
+        .glow-amber { box-shadow: 0 0 40px rgba(245, 158, 11, 0.12); }
+        .glow-red { box-shadow: 0 0 40px rgba(239, 68, 68, 0.12); }
+
+        .layer-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-            border-color: rgba(251, 191, 36, 0.3);
+        .layer-card:hover {
+            transform: translateY(-4px);
         }
 
-        /* Efectos de texto Neón */
-        .neon-text-gold {
-            color: #fbbf24;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        .pipeline-step {
+            position: relative;
         }
-        .neon-text-cyan {
-            color: #22d3ee;
-            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+        .pipeline-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -1rem;
+            width: 2rem;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
         }
 
-        /* Animaciones simples */
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in-up {
-            animation: fadeInUp 1s ease-out forwards;
+        .animate-in {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .float { animation: float 6s ease-in-out infinite; }
+
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
         }
     </style>
 </head>
-<body class="antialiased overflow-x-hidden">
+<body class="antialiased overflow-x-hidden grid-bg">
 
-    <!-- HERO SECTION (Portada) -->
-    <header class="min-h-screen flex flex-col justify-center items-center text-center p-6 bg-[url('https://images.unsplash.com/photo-1516937941348-c09645f31e88?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat relative">
-        <!-- Capa oscura superpuesta para legibilidad -->
-        <div class="absolute inset-0 bg-slate-900/90"></div>
-        
-        <div class="relative z-10 max-w-4xl mx-auto animate-fade-in-up">
-            <p class="text-cyan-400 tracking-[0.3em] text-xs md:text-sm mb-4 font-bold uppercase">Una Propuesta Conceptual</p>
-            <h1 class="text-6xl md:text-8xl font-bold mb-2 text-white leading-tight drop-shadow-2xl">VENEZUELA</h1>
-            <h2 class="text-4xl md:text-5xl font-light text-slate-300 mb-8 neon-text-gold">EL ÚLTIMO NODO</h2>
-            
-            <div class="w-24 h-1 bg-gradient-to-r from-yellow-400 to-red-600 mx-auto mb-8"></div>
-            
-            <p class="text-xl md:text-2xl text-slate-300 max-w-2xl mx-auto italic font-light">
-                "Esto nunca fue socialismo vs capitalismo. Fue recursos, ubicación, poder y tiempo."
+    <!-- HERO -->
+    <header class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/5 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto animate-in">
+            <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 text-xs text-slate-400 mb-8">
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                20 agentes · 5 capas · Debate estructurado · Veto
+            </div>
+
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-4">
+                Family Office
+            </h1>
+            <h2 class="text-3xl md:text-4xl font-light mb-8">
+                <span class="gradient-text">Sistema Agentico de Inversión</span>
+            </h2>
+
+            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+                Organización permanente de agentes de IA para inversión, preservación de patrimonio y control de riesgo. Cada decisión pasa por análisis independiente, debate estructurado y validación multi-capa.
             </p>
-            
-            <!-- Datos clave de la serie -->
-            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs md:text-sm font-mono text-slate-400 border-t border-slate-700 pt-6">
-                <div>7 TEMPORADAS</div>
-                <div>GÉNERO: GEOPOLÍTICA</div>
-                <div>ESTADO: CLASIFICADO</div>
-                <div>OBJETIVO: REDISEÑO</div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#arquitectura" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors">
+                    Ver Arquitectura
+                </a>
+                <a href="#pipeline" class="glass hover:bg-slate-800/80 text-slate-300 font-medium px-8 py-3 rounded-lg transition-colors">
+                    Pipeline de Decisión
+                </a>
             </div>
         </div>
-        
-        <div class="absolute bottom-10 animate-bounce text-slate-500">
-            <p class="text-xs uppercase tracking-widest mb-2">Desliza para investigar</p>
-            <span class="text-2xl">⬇</span>
+
+        <div class="absolute bottom-10 text-slate-600 animate-bounce">
+            <span class="text-2xl">↓</span>
         </div>
     </header>
 
-    <!-- MAIN CONTENT GRID -->
-    <main class="container mx-auto px-4 py-16 space-y-32">
+    <main class="container mx-auto px-4 py-16 space-y-32 max-w-6xl">
 
-        <!-- SECCIÓN 1: LOS RECURSOS (Temporada 1) -->
-        <section id="season-1" class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div class="space-y-6">
-                <div class="flex items-center space-x-4">
-                    <span class="bg-yellow-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(234,179,8,0.5)]">T1</span>
-                    <h2 class="text-4xl cinematic-title text-white">El Botín Enterrado</h2>
-                </div>
-                <p class="text-lg text-slate-300 leading-relaxed border-l-2 border-yellow-500 pl-4">
-                    Para entender el conflicto, primero hay que entender el premio. Venezuela no es un problema político; es un <strong>activo geoestratégico</strong> mal gestionado. La primera temporada explora la magnitud absurda de los recursos bajo el suelo.
-                </p>
-                <ul class="space-y-4 text-slate-400 font-light">
-                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
-                        <span class="text-yellow-400 mr-3 text-xl">🛢️</span>
-                        <span><strong>Petróleo:</strong> Las mayores reservas probadas del planeta (+300B barriles).</span>
-                    </li>
-                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
-                        <span class="text-yellow-400 mr-3 text-xl">💨</span>
-                        <span><strong>Gas:</strong> 8va reserva mundial, clave para la transición energética.</span>
-                    </li>
-                    <li class="flex items-start bg-slate-800/50 p-3 rounded">
-                        <span class="text-yellow-400 mr-3 text-xl">⚓</span>
-                        <span><strong>Ubicación:</strong> Acceso directo al Atlántico y el Caribe (El "Nodo").</span>
-                    </li>
-                </ul>
+        <!-- MÉTRICAS -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass rounded-xl p-6 text-center glow-blue layer-card">
+                <div class="text-3xl md:text-4xl font-bold text-blue-400">20</div>
+                <div class="text-sm text-slate-400 mt-2">Agentes Especializados</div>
             </div>
-            
-            <div class="glass-card p-6 rounded-xl shadow-2xl">
-                <h3 class="text-lg md:text-xl text-center mb-6 text-cyan-400 font-bold tracking-wider uppercase">Reservas Probadas (Miles de Millones de Barriles)</h3>
-                <div class="chart-container">
-                    <canvas id="reservesChart"></canvas>
-                </div>
-                <p class="text-xs text-center text-slate-500 mt-4">El tamaño de la barra representa el poder estratégico potencial.</p>
+            <div class="glass rounded-xl p-6 text-center glow-green layer-card">
+                <div class="text-3xl md:text-4xl font-bold text-green-400">5</div>
+                <div class="text-sm text-slate-400 mt-2">Capas Organizacionales</div>
+            </div>
+            <div class="glass rounded-xl p-6 text-center glow-amber layer-card">
+                <div class="text-3xl md:text-4xl font-bold text-amber-400">7</div>
+                <div class="text-sm text-slate-400 mt-2">Fases de Decisión</div>
+            </div>
+            <div class="glass rounded-xl p-6 text-center glow-red layer-card">
+                <div class="text-3xl md:text-4xl font-bold text-red-400">7</div>
+                <div class="text-sm text-slate-400 mt-2">Jurisdicciones Fiscales</div>
             </div>
         </section>
 
-        <!-- SECCIÓN 2: EL COLAPSO (Temporadas 2, 3, 4) -->
-        <section id="season-2-4" class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-gradient-to-br from-slate-900 to-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl relative overflow-hidden">
-            <!-- Elemento decorativo de fondo -->
-            <div class="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-3xl -z-10"></div>
+        <!-- ARQUITECTURA -->
+        <section id="arquitectura" class="space-y-12">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Arquitectura Multi-Agente</h2>
+                <p class="text-slate-400 text-lg">Cada capa tiene responsabilidades claras. Los agentes operan con contratos explícitos que definen lo que pueden y no pueden hacer.</p>
+            </div>
 
-            <div class="lg:col-span-4 space-y-6 z-10">
-                <div class="flex items-center space-x-4">
-                    <span class="bg-red-600 text-white font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(220,38,38,0.5)]">T2-T4</span>
-                    <h2 class="text-3xl cinematic-title text-white">El Colapso y El Éxodo</h2>
+            <!-- Capa 1: Dirección -->
+            <div class="layer-card glass rounded-2xl p-6 border-l-4 border-blue-500 glow-blue">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-blue-500/20 text-blue-400 text-xs font-bold px-3 py-1 rounded-full">CAPA 1</span>
+                    <h3 class="text-xl font-bold text-white">Dirección</h3>
                 </div>
-                <p class="text-slate-300 text-sm md:text-base">
-                    La destrucción de PDVSA y las sanciones crearon una tormenta perfecta. Mientras la producción caía en picada, el capital humano huía. Un vaciamiento institucional que dio paso a economías de sombra.
-                </p>
-                <div class="grid grid-cols-2 gap-4 mt-6">
-                    <div class="bg-slate-950 p-4 rounded border-l-4 border-red-500">
-                        <div class="text-2xl md:text-3xl font-bold text-white">-75%</div>
-                        <div class="text-xs text-slate-400 uppercase tracking-wide">Caída del PIB</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">CIO</div>
+                        <div class="text-xs text-slate-400">Síntesis estratégica y recomendación final al Principal</div>
                     </div>
-                    <div class="bg-slate-950 p-4 rounded border-l-4 border-yellow-500">
-                        <div class="text-2xl md:text-3xl font-bold text-white">7.7M+</div>
-                        <div class="text-xs text-slate-400 uppercase tracking-wide">Diáspora</div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Head of Tax Strategy <span class="text-red-400 text-xs ml-1">VETO</span></div>
+                        <div class="text-xs text-slate-400">Optimización fiscal y autoridad de veto tributario</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Investment Committee</div>
+                        <div class="text-xs text-slate-400">Debate estructurado y síntesis de contradicciones</div>
                     </div>
                 </div>
             </div>
 
-            <div class="lg:col-span-8 glass-card p-4 md:p-6 rounded-xl z-10">
-                <h3 class="text-lg text-center mb-6 text-red-400 font-bold tracking-wider uppercase">Correlación Inversa: Producción vs. Migración</h3>
-                <div class="chart-container">
-                    <canvas id="collapseChart"></canvas>
+            <!-- Capa 2: Análisis -->
+            <div class="layer-card glass rounded-2xl p-6 border-l-4 border-green-500 glow-green">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-green-500/20 text-green-400 text-xs font-bold px-3 py-1 rounded-full">CAPA 2</span>
+                    <h3 class="text-xl font-bold text-white">Análisis</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Macro/Geopolítica</div>
+                        <div class="text-xs text-slate-400">Ciclos macro y riesgos geopolíticos</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Fundamental</div>
+                        <div class="text-xs text-slate-400">Análisis de fundamentales</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Técnico/Quant</div>
+                        <div class="text-xs text-slate-400">Análisis técnico y modelos cuantitativos</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Crédito/Bonos</div>
+                        <div class="text-xs text-slate-400">Renta fija y riesgo crediticio</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Activos Reales</div>
+                        <div class="text-xs text-slate-400">Inmobiliario, infraestructura, commodities</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capa 3: Fiscal -->
+            <div class="layer-card glass rounded-2xl p-6 border-l-4 border-amber-500 glow-amber">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-amber-500/20 text-amber-400 text-xs font-bold px-3 py-1 rounded-full">CAPA 3</span>
+                    <h3 class="text-xl font-bold text-white">Fiscal & Legal</h3>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">España</div>
+                        <div class="text-xs text-slate-400">IRPF, IS, IP, tratados</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">Portugal</div>
+                        <div class="text-xs text-slate-400">NHR, IRS, tratados</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">Panamá</div>
+                        <div class="text-xs text-slate-400">Territorial, SEM, fundaciones</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">Barbados</div>
+                        <div class="text-xs text-slate-400">IBC, tratados, sustancia</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">Estados Unidos</div>
+                        <div class="text-xs text-slate-400">FATCA, withholding, treaties</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white">Venezuela</div>
+                        <div class="text-xs text-slate-400">ISLR, cambio, sanciones</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4 md:col-span-2">
+                        <div class="text-sm font-semibold text-white">Cross-Border</div>
+                        <div class="text-xs text-slate-400">CFC rules, transfer pricing, PE risk, treaty shopping</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capa 4: Riesgo -->
+            <div class="layer-card glass rounded-2xl p-6 border-l-4 border-red-500 glow-red">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-red-500/20 text-red-400 text-xs font-bold px-3 py-1 rounded-full">CAPA 4</span>
+                    <h3 class="text-xl font-bold text-white">Riesgo & Control</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Risk Manager <span class="text-red-400 text-xs ml-1">VETO</span></div>
+                        <div class="text-xs text-slate-400">Riesgo de portfolio, drawdown, concentración, correlación. Puede bloquear cualquier operación.</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Tax Risk & Audit</div>
+                        <div class="text-xs text-slate-400">Evaluación de riesgo fiscal y defensa ante auditorías</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capa 5: Operaciones -->
+            <div class="layer-card glass rounded-2xl p-6 border-l-4 border-purple-500" style="box-shadow: 0 0 40px rgba(168, 85, 247, 0.12);">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="bg-purple-500/20 text-purple-400 text-xs font-bold px-3 py-1 rounded-full">CAPA 5</span>
+                    <h3 class="text-xl font-bold text-white">Operaciones</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Portfolio Ops</div>
+                        <div class="text-xs text-slate-400">Gestión de portfolio, seguimiento de posiciones y ejecución</div>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-lg p-4">
+                        <div class="text-sm font-semibold text-white mb-1">Opportunity Scanner</div>
+                        <div class="text-xs text-slate-400">Detección de oportunidades y sourcing de deals</div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN 3: EL GIRO ESTRATÉGICO (Temporada 5) -->
-        <section id="season-5" class="space-y-12">
-            <div class="text-center max-w-3xl mx-auto space-y-4">
-                <span class="bg-cyan-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(34,211,238,0.5)]">T5</span>
-                <h2 class="text-4xl cinematic-title text-white">El Punto de Inflexión</h2>
-                <p class="text-lg text-slate-300">
-                    "Control sin Invasión". La seguridad energética cambia el cálculo global. Venezuela pasa de ser un estado paria a un mal necesario para Occidente.
-                </p>
+        <!-- PIPELINE -->
+        <section id="pipeline" class="space-y-12">
+            <div class="text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Pipeline de Decisión</h2>
+                <p class="text-slate-400 text-lg">Cada propuesta de inversión pasa por 7 fases de validación antes de llegar al Principal. Los agentes trabajan de forma independiente para evitar groupthink.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div class="glass-card p-6 rounded-xl order-2 md:order-1">
-                    <h3 class="text-xl text-center mb-4 text-cyan-400 font-bold uppercase">Matriz de Influencia</h3>
-                    <div class="chart-container">
-                        <canvas id="geopoliticsChart"></canvas>
-                    </div>
-                    <p class="text-xs text-center text-slate-500 mt-4">Competencia por el control de activos clave</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-blue-400/30 absolute top-4 right-4">01</div>
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold mb-3">A</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Análisis Paralelo</h3>
+                    <p class="text-xs text-slate-400">5 agentes producen vistas independientes sin ver el trabajo de los otros.</p>
                 </div>
 
-                <div class="space-y-8 order-1 md:order-2">
-                    <h3 class="text-2xl text-white font-bold border-b border-cyan-500 pb-2 inline-block">El Nuevo Mapa Energético</h3>
-                    <div class="space-y-6">
-                        <div class="flex items-start group">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-slate-800 border border-cyan-500 flex items-center justify-center text-cyan-400 font-bold group-hover:bg-cyan-500 group-hover:text-black transition-colors">1</div>
-                            <div class="ml-4">
-                                <h4 class="text-white font-bold text-lg">Pragmatismo vs. Ideología</h4>
-                                <p class="text-sm text-slate-400 mt-1">EE. UU. necesita crudo pesado para sus refinerías. La ideología pasa a segundo plano ante la seguridad de suministro.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start group">
-                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-slate-800 border border-red-500 flex items-center justify-center text-red-400 font-bold group-hover:bg-red-500 group-hover:text-white transition-colors">2</div>
-                            <div class="ml-4">
-                                <h4 class="text-white font-bold text-lg">Contención Oriental</h4>
-                                <p class="text-sm text-slate-400 mt-1">Recuperar el mercado venezolano es vital para evitar una base de operaciones definitiva de rivales del Este en el Caribe.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECCIÓN 4: RECONSTRUCCIÓN (Temporada 6) -->
-        <section id="season-6" class="bg-gradient-to-t from-slate-950 to-slate-900 p-8 md:p-16 rounded-3xl shadow-2xl border-t border-slate-800">
-            <div class="text-center mb-16">
-                <span class="bg-green-500 text-black font-bold px-3 py-1 rounded shadow-[0_0_15px_rgba(34,197,94,0.5)]">T6</span>
-                <h2 class="text-4xl cinematic-title text-white mt-4">El Plan Marshall Tropical</h2>
-                <p class="text-slate-300 mt-4 max-w-2xl mx-auto italic">
-                    "Primero las reglas, luego el país."
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-                <!-- Línea conectora (Desktop) -->
-                <div class="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-slate-700 via-green-500 to-slate-700 -z-10"></div>
-
-                <!-- Fase 1 -->
-                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-green-500 transition-all shadow-lg group hover:-translate-y-2">
-                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-green-500 group-hover:text-green-500 text-slate-400 font-bold mx-auto md:mx-0">I</div>
-                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Estabilización</h3>
-                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Marco jurídico para proteger inversiones.</p>
-                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
-                        <div class="h-full bg-green-500 w-1/3"></div>
-                    </div>
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-amber-400/30 absolute top-4 right-4">02</div>
+                    <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 font-bold mb-3">F</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Evaluación Fiscal</h3>
+                    <p class="text-xs text-slate-400">7 agentes jurisdiccionales evalúan impacto tributario completo.</p>
                 </div>
 
-                <!-- Fase 2 -->
-                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-yellow-500 transition-all shadow-lg group hover:-translate-y-2">
-                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-yellow-500 group-hover:text-yellow-500 text-slate-400 font-bold mx-auto md:mx-0">II</div>
-                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Infraestructura</h3>
-                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Recuperación eléctrica y portuaria.</p>
-                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
-                        <div class="h-full bg-yellow-500 w-2/3"></div>
-                    </div>
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-cyan-400/30 absolute top-4 right-4">03</div>
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-bold mb-3">D</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Debate del Comité</h3>
+                    <p class="text-xs text-slate-400">El Comité de Inversión sintetiza vistas y confronta contradicciones.</p>
                 </div>
 
-                <!-- Fase 3 -->
-                <div class="bg-slate-800 p-8 rounded-xl border border-slate-600 hover:border-blue-500 transition-all shadow-lg group hover:-translate-y-2">
-                    <div class="w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center text-xl mb-4 border-2 border-slate-600 group-hover:border-blue-500 group-hover:text-blue-500 text-slate-400 font-bold mx-auto md:mx-0">III</div>
-                    <h3 class="text-xl font-bold text-white mb-2 text-center md:text-left">Reinserción</h3>
-                    <p class="text-sm text-slate-400 mb-4 text-center md:text-left">Hub energético y retorno de capital.</p>
-                    <div class="w-full h-1 bg-slate-700 rounded overflow-hidden">
-                        <div class="h-full bg-blue-500 w-full"></div>
-                    </div>
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-red-400/30 absolute top-4 right-4">04</div>
+                    <div class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 font-bold mb-3">V</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Veto Gate</h3>
+                    <p class="text-xs text-slate-400">Risk Manager y Head of Tax pueden bloquear la operación.</p>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-green-400/30 absolute top-4 right-4">05</div>
+                    <div class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400 font-bold mb-3">S</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Síntesis CIO</h3>
+                    <p class="text-xs text-slate-400">El CIO produce la recomendación final integrando todas las capas.</p>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card relative">
+                    <div class="text-3xl font-bold text-purple-400/30 absolute top-4 right-4">06</div>
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold mb-3">Q</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Validación</h3>
+                    <p class="text-xs text-slate-400">Regla de 5 condiciones verifica cumplimiento de todos los requisitos.</p>
+                </div>
+
+                <div class="glass rounded-xl p-5 layer-card relative md:col-span-2">
+                    <div class="text-3xl font-bold text-slate-400/30 absolute top-4 right-4">07</div>
+                    <div class="w-10 h-10 rounded-lg bg-slate-500/20 flex items-center justify-center text-slate-300 font-bold mb-3">P</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Presentación al Principal</h3>
+                    <p class="text-xs text-slate-400">Reporte estructurado con recomendación, riesgos, impacto fiscal y alternativas para la decisión humana final.</p>
                 </div>
             </div>
         </section>
 
-        <!-- TEMPORADA FINAL -->
-        <section class="text-center py-24 px-6 relative overflow-hidden">
-            <!-- Fondo degradado final -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-slate-900 to-transparent z-0"></div>
-            
-            <div class="relative z-10 max-w-4xl mx-auto animate-pulse-slow">
-                <span class="text-xs tracking-[0.5em] text-slate-500 uppercase">Episodio Final</span>
-                <h2 class="text-5xl md:text-7xl font-bold text-white mb-8 mt-4 leading-tight">"NUNCA FUE IDEOLOGÍA"</h2>
-                <div class="w-32 h-1 bg-white mx-auto mb-8 opacity-20"></div>
-                <p class="text-2xl text-slate-300 font-light italic mb-12">
-                    Fue recursos. Fue ubicación. Fue poder.
-                </p>
-                
-                <div class="inline-block p-0.5 bg-gradient-to-r from-yellow-500 to-red-600 rounded-lg transform hover:scale-105 transition-transform cursor-default">
-                    <div class="bg-black px-8 py-4 rounded font-mono text-white tracking-widest">
-                        FIN DE LA SERIE
-                    </div>
+        <!-- PRINCIPIOS -->
+        <section class="space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Principios de Diseño</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">◇</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Análisis Independiente</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Los agentes no ven el trabajo de otros antes de enviar su análisis. Esto previene el groupthink y asegura diversidad de perspectivas.</p>
                 </div>
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">◈</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Debate Estructurado</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">El Comité de Inversión sintetiza contradicciones en lugar de ocultarlas. Las discrepancias se presentan explícitamente.</p>
+                </div>
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">⬡</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Poder de Veto</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Solo el Risk Manager y Head of Tax Strategy tienen autoridad para bloquear operaciones. Safety-first by design.</p>
+                </div>
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">◎</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Memoria Persistente</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Todas las decisiones se registran con sus supuestos. El sistema aprende de patrones históricos y errores pasados.</p>
+                </div>
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">⟐</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Bus de Mensajes</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Toda comunicación pasa por el message bus. No hay comunicación directa agente-a-agente. Trazabilidad total.</p>
+                </div>
+                <div class="glass rounded-xl p-6 layer-card">
+                    <div class="text-2xl mb-3">⊞</div>
+                    <h3 class="text-sm font-bold text-white mb-2">Ejecución Asíncrona</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">Full async/await para ejecución paralela de agentes. Máxima eficiencia en el procesamiento de análisis.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECH STACK -->
+        <section class="glass rounded-2xl p-8 md:p-12">
+            <h2 class="text-2xl font-bold text-white mb-8 text-center">Stack Tecnológico</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div>
+                    <div class="text-sm font-semibold text-blue-400 mb-1">IA / LLM</div>
+                    <div class="text-xs text-slate-400">Anthropic Claude<br>OpenAI (opcional)</div>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-green-400 mb-1">Backend</div>
+                    <div class="text-xs text-slate-400">Python · FastAPI<br>Uvicorn · Pydantic</div>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-amber-400 mb-1">Datos</div>
+                    <div class="text-xs text-slate-400">yfinance · FRED<br>Alpha Vantage</div>
+                </div>
+                <div>
+                    <div class="text-sm font-semibold text-purple-400 mb-1">Persistencia</div>
+                    <div class="text-xs text-slate-400">SQLite · JSON Store<br>Memory Manager</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUICK START -->
+        <section class="space-y-8">
+            <h2 class="text-3xl font-bold text-white text-center">Inicio Rápido</h2>
+            <div class="glass rounded-2xl p-6 md:p-8 max-w-2xl mx-auto">
+                <pre class="text-sm text-slate-300 overflow-x-auto"><code><span class="text-slate-500"># Instalar dependencias</span>
+<span class="text-green-400">pip install</span> -r requirements.txt
+
+<span class="text-slate-500"># Configurar variables de entorno</span>
+<span class="text-green-400">cp</span> .env.example .env
+<span class="text-slate-500"># Editar .env con tus API keys</span>
+
+<span class="text-slate-500"># Iniciar dashboard web</span>
+<span class="text-green-400">python</span> main.py
+
+<span class="text-slate-500"># O modo CLI interactivo</span>
+<span class="text-green-400">python</span> main.py --cli</code></pre>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-black text-slate-600 py-12 text-center text-sm border-t border-slate-900">
-        <p class="mb-2 font-bold text-slate-500">NETFLIX ORIGINAL CONCEPT</p>
-        <p>Basado en el documento "Serie de Netflix - Venezuela.pdf"</p>
-        <p class="mt-4 text-xs opacity-50">Generado con IA • Chart.js • Tailwind CSS</p>
+    <footer class="border-t border-slate-800/50 py-12 text-center">
+        <p class="text-sm text-slate-500">Family Office — Sistema Agentico de Inversión</p>
+        <p class="text-xs text-slate-600 mt-2">20 agentes · 5 capas · 7 fases de decisión · 7 jurisdicciones</p>
     </footer>
 
-    <!-- CONFIGURACIÓN DE GRÁFICOS (JavaScript) -->
-    <script>
-        // --- UTILIDADES ---
-        // Función para dividir etiquetas largas en varias líneas
-        function splitLabel(label, maxLength = 16) {
-            if (label.length <= maxLength) return label;
-            const words = label.split(' ');
-            const lines = [];
-            let currentLine = words[0];
-
-            for (let i = 1; i < words.length; i++) {
-                if ((currentLine + " " + words[i]).length < maxLength) {
-                    currentLine += " " + words[i];
-                } else {
-                    lines.push(currentLine);
-                    currentLine = words[i];
-                }
-            }
-            lines.push(currentLine);
-            return lines;
-        }
-
-        // Configuración Global de Chart.js
-        Chart.defaults.color = '#94a3b8';
-        Chart.defaults.font.family = "'Roboto', sans-serif";
-        Chart.defaults.scale.grid.color = '#334155';
-        
-        // Tooltip para manejar etiquetas multilínea
-        const tooltipConfig = {
-            callbacks: {
-                title: function(tooltipItems) {
-                    const item = tooltipItems[0];
-                    let label = item.chart.data.labels[item.dataIndex];
-                    if (Array.isArray(label)) {
-                        return label.join(' ');
-                    } else {
-                        return label;
-                    }
-                }
-            }
-        };
-
-        // --- CHART 1: RESERVAS DE PETRÓLEO (Barras) ---
-        const ctxReserves = document.getElementById('reservesChart').getContext('2d');
-        const reservesData = {
-            labels: ['Venezuela', 'Arabia Saudita', 'Canadá', 'Irán', 'Irak'],
-            datasets: [{
-                label: 'Reservas (Miles de Millones de Barriles)',
-                data: [304, 298, 170, 156, 145],
-                backgroundColor: [
-                    '#fbbf24', // Oro Venezuela (Destacado)
-                    '#475569', // Slate
-                    '#475569',
-                    '#475569',
-                    '#475569'
-                ],
-                borderWidth: 0,
-                borderRadius: 4,
-                barPercentage: 0.7
-            }]
-        };
-        reservesData.labels = reservesData.labels.map(l => splitLabel(l));
-
-        new Chart(ctxReserves, {
-            type: 'bar',
-            data: reservesData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y', // Barra horizontal
-                plugins: {
-                    legend: { display: false },
-                    tooltip: tooltipConfig
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
-                    },
-                    y: {
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        // --- CHART 2: EL COLAPSO (Línea Doble Eje) ---
-        const ctxCollapse = document.getElementById('collapseChart').getContext('2d');
-        
-        new Chart(ctxCollapse, {
-            type: 'line',
-            data: {
-                labels: ['2012', '2014', '2016', '2018', '2020', '2022'],
-                datasets: [
-                    {
-                        label: 'Producción Petrolera (M bpd)',
-                        data: [2.8, 2.4, 2.1, 1.4, 0.5, 0.7],
-                        borderColor: '#fbbf24', // Oro
-                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                        yAxisID: 'y',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4
-                    },
-                    {
-                        label: 'Migración Acumulada (Millones)',
-                        data: [0.5, 1.2, 2.3, 4.0, 5.4, 7.7],
-                        borderColor: '#ef4444', // Rojo
-                        backgroundColor: 'transparent',
-                        yAxisID: 'y1',
-                        borderDash: [5, 5],
-                        tension: 0.4,
-                        pointRadius: 4
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    tooltip: tooltipConfig,
-                    legend: {
-                        position: 'top',
-                        labels: { color: '#e2e8f0', usePointStyle: true }
-                    }
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: { display: true, text: 'Producción (M bpd)', color: '#fbbf24' },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: { display: true, text: 'Migrantes (Millones)', color: '#ef4444' },
-                        grid: { display: false }
-                    }
-                }
-            }
-        });
-
-        // --- CHART 3: GEOPOLÍTICA (Radar) ---
-        const ctxGeo = document.getElementById('geopoliticsChart').getContext('2d');
-        
-        new Chart(ctxGeo, {
-            type: 'radar',
-            data: {
-                labels: ['Finanzas/Deuda', 'Militar', 'Infraestructura', 'Energía', 'Diplomacia'],
-                datasets: [
-                    {
-                        label: 'China',
-                        data: [90, 20, 80, 70, 60],
-                        fill: true,
-                        backgroundColor: 'rgba(34, 211, 238, 0.1)', // Cyan
-                        borderColor: '#22d3ee',
-                        pointBackgroundColor: '#22d3ee',
-                        borderWidth: 2
-                    },
-                    {
-                        label: 'Rusia',
-                        data: [40, 90, 30, 85, 50],
-                        fill: true,
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)', // Red
-                        borderColor: '#ef4444',
-                        pointBackgroundColor: '#ef4444',
-                        borderWidth: 2
-                    },
-                    {
-                        label: 'EE. UU. (Interés)',
-                        data: [30, 10, 20, 95, 40],
-                        fill: true,
-                        backgroundColor: 'rgba(251, 191, 36, 0.1)', // Gold
-                        borderColor: '#fbbf24',
-                        pointBackgroundColor: '#fbbf24',
-                        borderWidth: 2
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                elements: {
-                    line: { borderWidth: 2 }
-                },
-                plugins: {
-                    tooltip: tooltipConfig,
-                    legend: { position: 'bottom', labels: { boxWidth: 10, padding: 20 } }
-                },
-                scales: {
-                    r: {
-                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                        pointLabels: {
-                            color: '#e2e8f0',
-                            font: { size: 12 }
-                        },
-                        ticks: { display: false, backdropColor: 'transparent' }
-                    }
-                }
-            }
-        });
-    </script>
 </body>
 </html>
